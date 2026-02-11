@@ -1,0 +1,2814 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - Create Newsletter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/newsletter.css">
+    <link rel="stylesheet" href="css/builder-enhanced.css">
+    <style>
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            min-height: calc(100vh - 200px);
+        }
+        @media (max-width: 1200px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .item-select {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border: 1px solid var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .item-select:hover {
+            border-color: var(--ubt-green);
+            background: var(--ubt-green-light);
+        }
+        .item-select.selected {
+            border-color: var(--ubt-green);
+            background: var(--ubt-green-light);
+        }
+        .item-select input[type="checkbox"] {
+            margin-top: 4px;
+        }
+        .item-select-content {
+            flex: 1;
+        }
+        .preview-frame {
+            background: var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            height: 100%;
+            min-height: 600px;
+        }
+        .preview-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            min-height: 600px;
+        }
+        .section-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        .section-tab {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--ubt-light-gray);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .section-tab.active {
+            background: var(--ubt-green);
+            color: var(--ubt-white);
+        }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            background: var(--ubt-white);
+            border-top: 1px solid var(--ubt-light-gray);
+            position: sticky;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Create Newsletter</h1>
+                <p class="page-subtitle">Select content items and preview your newsletter</p>
+            </div>
+
+            <div class="builder-layout-enhanced" id="builderLayout">
+                <!-- Unified Content Panel (Left) -->
+                <div class="content-panel" id="contentPanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Newsletter Content</h2>
+                            <div class="flex gap-sm">
+                                <button class="btn btn-sm btn-secondary" id="btnSelectAll" title="Select all visible">All</button>
+                                <button class="btn btn-sm btn-secondary" id="btnSelectNone" title="Clear selection">None</button>
+                                <button class="btn btn-sm btn-secondary" id="btnResetOrder" title="Reset order">Reset</button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <!-- Category Tabs -->
+                            <div class="section-tabs" style="padding: var(--spacing-md); border-bottom: 1px solid var(--ubt-light-gray); flex-wrap: wrap;">
+                                <button class="section-tab active" data-category="all">All</button>
+                                <button class="section-tab" data-category="news">News</button>
+                                <button class="section-tab" data-category="event">Events</button>
+                                <button class="section-tab" data-category="lecture">Lectures</button>
+                                <button class="section-tab" data-category="publication">Publications</button>
+                                <button class="section-tab" data-category="member">Members</button>
+                                <button class="section-tab" data-category="project">Projects</button>
+                                <button class="section-tab" data-category="csv">CSV Items</button>
+                                <button class="add-custom-btn" id="btnAddCustomItem" title="Create custom content">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    Add Custom
+                                </button>
+                                <button class="add-custom-btn" id="btnImportCSV" title="Import items from CSV file">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
+                                    Import CSV
+                                </button>
+                            </div>
+
+                            <!-- Year Filter for Publications -->
+                            <div class="year-filter" id="yearFilter" style="display: none;">
+                                <div class="year-filter-chips">
+                                    <button class="year-chip active" data-year="all">All</button>
+                                    <button class="year-chip" data-year="2026">2026</button>
+                                    <button class="year-chip" data-year="2025">2025</button>
+                                    <button class="year-chip" data-year="2024">2024</button>
+                                    <button class="year-chip" data-year="2023">2023</button>
+                                    <button class="year-chip" data-year="2022">2022</button>
+                                    <button class="year-chip" data-year="earlier">Earlier</button>
+                                </div>
+                                <div class="year-filter-sort">
+                                    <label for="pubSortOrder">Sort:</label>
+                                    <select id="pubSortOrder" class="pub-sort-select">
+                                        <option value="newest">Newest First</option>
+                                        <option value="oldest">Oldest First</option>
+                                        <option value="title">Title A-Z</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Newsletter Settings Panel -->
+                            <div class="newsletter-settings" id="newsletterSettings">
+                                <div class="newsletter-settings-header">
+                                    <span class="newsletter-settings-title">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
+                                        Newsletter Settings
+                                    </span>
+                                    <button class="newsletter-settings-toggle" id="settingsToggle" title="Toggle settings">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                                    </button>
+                                </div>
+                                <div class="newsletter-settings-body" id="settingsBody">
+                                    <div class="settings-row">
+                                        <label>
+                                            <input type="checkbox" id="settingShowLogo">
+                                            Show RAIS² Logo
+                                        </label>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label for="settingDividerStyle">Section Dividers:</label>
+                                        <select id="settingDividerStyle">
+                                            <option value="none">None</option>
+                                            <option value="solid">Solid Line</option>
+                                            <option value="gradient" selected>Gradient</option>
+                                            <option value="dots">Dots</option>
+                                            <option value="wave">Wave</option>
+                                        </select>
+                                    </div>
+                                    <div class="settings-row">
+                                        <label for="settingFeaturedItem">Featured Item:</label>
+                                        <select id="settingFeaturedItem">
+                                            <option value="">None</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Newsletter Intro (if exists) -->
+                            <div id="newsletterIntroSection" style="display: none; padding: var(--spacing-md); background: var(--ubt-green-light, #e6f4ef); border-bottom: 1px solid var(--ubt-light-gray);">
+                                <div class="intro-block-card">
+                                    <div class="intro-block-header">
+                                        <span class="intro-block-label">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9z"/></svg>
+                                            Newsletter Introduction
+                                        </span>
+                                        <div class="intro-block-actions">
+                                            <button class="btn-icon" id="btnEditIntro" title="Edit intro">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                            </button>
+                                            <button class="btn-icon btn-danger" id="btnDeleteIntro" title="Remove intro">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="intro-block-content" id="introBlockContent">
+                                        Click edit to add introduction text...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add Intro Button (when no intro exists) -->
+                            <div id="addIntroSection" style="padding: var(--spacing-md); border-bottom: 1px solid var(--ubt-light-gray);">
+                                <button class="add-block-btn" id="btnAddIntro" style="width: 100%;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    Add Newsletter Introduction
+                                </button>
+                            </div>
+
+                            <!-- Sections with Items -->
+                            <div id="sectionsList" style="max-height: calc(100vh - 450px); overflow-y: auto;">
+                                <div class="loading"><div class="spinner"></div></div>
+                            </div>
+
+                            <!-- Trash Drop Zone -->
+                            <div class="trash-drop-zone" id="trashDropZone">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                <span>Drop here to remove from newsletter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview (Right) -->
+                <div class="preview-panel">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-header">
+                            <h2 class="card-title">Preview</h2>
+                            <span class="text-muted" id="selectedCount">0 items selected</span>
+                        </div>
+                        <div class="preview-frame" style="height: calc(100% - 60px);">
+                            <iframe id="previewFrame" srcdoc="<html><body style='font-family: sans-serif; color: #7F8990; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;'><p>Select items to preview newsletter</p></body></html>"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intro Edit Modal -->
+            <div class="modal-overlay" id="introModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Edit Newsletter Introduction</h3>
+                        <button class="modal-close" onclick="closeIntroModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-md">Write a welcoming introduction for your newsletter. This appears at the top before any content sections.</p>
+                        <textarea id="introTextarea" class="form-textarea" rows="6" placeholder="Welcome to this edition of the RAIS² Newsletter..."></textarea>
+                        <div class="ai-assist-panel" style="margin-top: var(--spacing-md);">
+                            <button class="btn btn-sm btn-secondary" id="btnAIGenerateIntro">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9z"/></svg>
+                                Generate with AI
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeIntroModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnSaveIntro">Save Introduction</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Description Modal -->
+            <div class="modal-overlay" id="descriptionModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Edit Description</h3>
+                        <button class="modal-close" onclick="closeDescriptionModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-md" id="descriptionItemTitle">Custom description for this item</p>
+                        <textarea id="descriptionTextarea" class="form-textarea" rows="4" placeholder="Enter a custom description for the newsletter..."></textarea>
+                        <div class="ai-assist-panel" style="margin-top: var(--spacing-md);">
+                            <button class="btn btn-sm btn-secondary" id="btnAIGenerateDesc">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9z"/></svg>
+                                Generate with AI
+                            </button>
+                            <button class="btn btn-sm btn-secondary" id="btnClearDesc">Clear</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeDescriptionModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnSaveDescription">Save Description</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Item Modal -->
+            <div class="modal-overlay" id="customItemModal">
+                <div class="modal" style="max-width: 550px;">
+                    <div class="modal-header">
+                        <h3>Add Custom Item</h3>
+                        <button class="modal-close" onclick="closeCustomItemModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-md">Create custom content that will appear in your newsletter alongside scraped items.</p>
+
+                        <!-- Item Type Selector -->
+                        <div class="custom-item-type-selector">
+                            <button class="custom-item-type-btn active" data-type="event" onclick="selectCustomItemType('event')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                                <span>Event</span>
+                            </button>
+                            <button class="custom-item-type-btn" data-type="news" onclick="selectCustomItemType('news')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>
+                                <span>News</span>
+                            </button>
+                            <button class="custom-item-type-btn" data-type="announcement" onclick="selectCustomItemType('announcement')">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 11c0-1.1-.9-2-2-2V7c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2v-2c1.1 0 2-.9 2-2v-2zm-2 0v2H7v-2h9z"/></svg>
+                                <span>Announcement</span>
+                            </button>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="custom-item-fields">
+                            <div class="form-group">
+                                <label class="form-label">Title *</label>
+                                <input type="text" class="form-input" id="customItemTitle" placeholder="Enter title...">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Description / Summary</label>
+                                <textarea class="form-textarea" id="customItemSummary" rows="3" placeholder="Enter a brief description..."></textarea>
+                            </div>
+
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="text" class="form-input" id="customItemDate" placeholder="DD.MM.YYYY">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">URL (optional)</label>
+                                    <input type="text" class="form-input" id="customItemUrl" placeholder="https://...">
+                                </div>
+                            </div>
+
+                            <!-- Event-specific fields -->
+                            <div class="event-specific-fields" id="eventFields">
+                                <div class="field-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Time</label>
+                                        <input type="text" class="form-input" id="customItemTime" placeholder="14:00 - 16:00">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Location</label>
+                                        <input type="text" class="form-input" id="customItemLocation" placeholder="Room S 106, AI Building">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Speaker (optional)</label>
+                                    <input type="text" class="form-input" id="customItemSpeaker" placeholder="Prof. Dr. Example">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeCustomItemModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnSaveCustomItem">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            Add Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSV Import Modal -->
+            <div class="modal-overlay" id="csvImportModal">
+                <div class="modal" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3>Import from CSV</h3>
+                        <button class="modal-close" onclick="closeCsvImportModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-md">Upload a CSV file to import items directly into the newsletter builder.</p>
+                        <div style="position: relative; display: inline-block; width: 100%;">
+                            <input type="file" id="builderCsvFileInput" accept=".csv" style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;" />
+                            <label for="builderCsvFileInput" style="display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); padding: var(--spacing-xl); border: 2px dashed var(--ubt-medium-gray); border-radius: var(--radius-md); background: var(--ubt-light-gray); cursor: pointer; transition: var(--transition);" id="builderFileLabel">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
+                                <span id="builderFileLabelText">Click to select CSV file or drag and drop</span>
+                            </label>
+                        </div>
+                        <div id="csvImportPreview" style="display: none; margin-top: var(--spacing-lg); max-height: 300px; overflow-y: auto;">
+                            <h4 style="margin-bottom: var(--spacing-sm);">Found Items:</h4>
+                            <div id="csvImportItemsList"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeCsvImportModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnConfirmCsvImport" disabled>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
+                            Import Items
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphical Block Modal -->
+            <div class="modal-overlay" id="graphicalBlockModal">
+                <div class="modal" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3>Add Graphical Element</h3>
+                        <button class="modal-close" onclick="closeGraphicalBlockModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-md">Add a visual element to your newsletter.</p>
+
+                        <div class="block-type-grid">
+                            <div class="block-type-card" data-block-type="image" onclick="selectBlockType('image')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                <div class="block-type-name">Image</div>
+                                <div class="block-type-desc">Add an image with caption</div>
+                            </div>
+                            <div class="block-type-card" data-block-type="cta-button" onclick="selectBlockType('cta-button')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z"/></svg>
+                                <div class="block-type-name">Button</div>
+                                <div class="block-type-desc">Call-to-action button</div>
+                            </div>
+                            <div class="block-type-card" data-block-type="quote" onclick="selectBlockType('quote')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+                                <div class="block-type-name">Quote</div>
+                                <div class="block-type-desc">Testimonial or quote</div>
+                            </div>
+                            <div class="block-type-card" data-block-type="feature-box" onclick="selectBlockType('feature-box')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1.06 13.54L7.4 12l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41-5.64 5.66z"/></svg>
+                                <div class="block-type-name">Feature</div>
+                                <div class="block-type-desc">Icon + text box</div>
+                            </div>
+                            <div class="block-type-card" data-block-type="divider" onclick="selectBlockType('divider')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h16v2H4zm0 4h10v2H4z"/></svg>
+                                <div class="block-type-name">Divider</div>
+                                <div class="block-type-desc">Visual separator</div>
+                            </div>
+                            <div class="block-type-card" data-block-type="callout" onclick="selectBlockType('callout')">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                <div class="block-type-name">Callout</div>
+                                <div class="block-type-desc">Highlighted message</div>
+                            </div>
+                        </div>
+
+                        <!-- Block-specific form fields (shown based on selection) -->
+                        <div id="blockFieldsContainer" style="display:none;">
+                            <!-- Fields will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeGraphicalBlockModal()">Cancel</button>
+                        <button class="btn btn-primary" id="btnSaveGraphicalBlock" disabled>Add Block</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <div class="flex gap-md">
+                    <button class="btn btn-secondary" id="btnDownload">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        Download HTML
+                    </button>
+                    <button class="btn btn-secondary" id="btnCopy">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        Copy HTML
+                    </button>
+                    <button class="btn btn-secondary" id="btnSave">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                        Save Draft
+                    </button>
+                </div>
+                <button class="btn btn-primary btn-lg" id="btnSend">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    Send Newsletter
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- AI Toggle Button -->
+    <button class="ai-toggle-btn" id="aiToggleBtn" title="AI Assistant">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/>
+        </svg>
+    </button>
+
+    <!-- AI Chat Panel -->
+    <div class="ai-chat-panel" id="aiChatPanel">
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/>
+                </svg>
+                <span>AI Assistant</span>
+                <span class="ai-provider-badge" id="aiProviderBadge"></span>
+            </div>
+            <div class="ai-chat-header-actions">
+                <button class="ai-chat-header-btn" id="aiClearHistoryBtn" title="Clear chat history">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+                <button class="ai-chat-header-btn" id="aiSettingsBtn" title="AI Settings">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </button>
+                <button class="ai-chat-header-btn ai-chat-close" id="aiChatClose" title="Close">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Quick Settings Panel -->
+        <div class="ai-quick-settings" id="aiQuickSettings" style="display: none;">
+            <div class="ai-quick-settings-header">
+                <span>Quick Settings</span>
+                <button class="ai-quick-settings-close" id="aiQuickSettingsClose">×</button>
+            </div>
+            <div class="ai-quick-settings-body">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Provider</label>
+                    <select class="form-input" id="aiQuickProvider" style="font-size: 13px; padding: 6px 8px;">
+                        <option value="openrouter">OpenRouter (Free Models)</option>
+                        <option value="puter">Puter.js / Grok (Free)</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 4px;">Model</label>
+                    <select class="form-input" id="aiQuickModel" style="font-size: 13px; padding: 6px 8px;">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-sm btn-primary" id="aiQuickSave" style="flex: 1;">Apply</button>
+                    <a href="settings.html" class="btn btn-sm btn-secondary" style="flex: 1; text-align: center;">Full Settings</a>
+                </div>
+            </div>
+        </div>
+        <div class="ai-chat-body">
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <!-- Messages render here -->
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <div class="ai-quick-actions">
+                <button class="ai-quick-btn" data-action="write-intro">Write Intro</button>
+                <button class="ai-quick-btn" data-action="summarize">Summarize</button>
+                <button class="ai-quick-btn" data-action="enhance">Enhance Text</button>
+            </div>
+            <div class="ai-input-wrapper">
+                <textarea id="aiInput" placeholder="Ask AI for help..." rows="1"></textarea>
+                <button class="ai-send-btn" id="aiSendBtn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Modal -->
+    <div class="modal-overlay" id="sendModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Send Newsletter</h3>
+                <button class="modal-close" onclick="App.closeModal('sendModal')">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="sendModalBody">
+                <!-- Content will be filled dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/newsletter.js"></script>
+    <script src="js/email.js"></script>
+    <script src="js/subscribers.js"></script>
+    <script src="js/drag-drop.js"></script>
+    <script src="js/block-manager.js"></script>
+    <script src="js/custom-items.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/ai-chat.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // AI Model options per provider
+        const AI_MODELS = {
+            openrouter: [
+                // ═══════════ FREE MODELS ═══════════
+                { value: 'meta-llama/llama-4-maverick:free', label: '🆓 Llama 4 Maverick (400B - Best)' },
+                { value: 'meta-llama/llama-4-scout:free', label: '🆓 Llama 4 Scout' },
+                { value: 'google/gemini-2.5-pro-exp-03-25:free', label: '🆓 Gemini 2.5 Pro Experimental' },
+                { value: 'deepseek/deepseek-chat-v3-0324:free', label: '🆓 DeepSeek Chat V3 (Coding)' },
+                { value: 'deepseek/deepseek-r1-zero:free', label: '🆓 DeepSeek R1 Zero (Reasoning)' },
+                { value: 'mistralai/mistral-small-3.1-24b-instruct:free', label: '🆓 Mistral Small 3.1 24B' },
+                { value: 'nousresearch/hermes-3-llama-3.1-405b:free', label: '🆓 Hermes 3 405B' },
+                { value: 'deepseek/deepseek-v3-base:free', label: '🆓 DeepSeek V3 Base' },
+                { value: 'nvidia/llama-3.1-nemotron-nano-8b-v1:free', label: '🆓 NVIDIA Nemotron Nano 8B' },
+                { value: 'nousresearch/deephermes-3-llama-3-8b-preview:free', label: '🆓 DeepHermes 3 Llama 8B' },
+                { value: 'google/gemma-2-9b-it:free', label: '🆓 Gemma 2 9B' },
+                { value: 'qwen/qwen2.5-vl-3b-instruct:free', label: '🆓 Qwen 2.5 VL 3B' },
+                { value: 'moonshotai/kimi-vl-a3b-thinking:free', label: '🆓 Kimi VL A3B (Visual)' },
+                { value: 'mistralai/mistral-7b-instruct:free', label: '🆓 Mistral 7B' },
+                { value: 'meta-llama/llama-3.2-3b-instruct:free', label: '🆓 Llama 3.2 3B (Fast)' },
+                // ═══════════ PREMIUM MODELS ═══════════
+                { value: 'x-ai/grok-beta', label: '💎 Grok Beta' },
+                { value: 'openai/gpt-4o-mini', label: '💎 GPT-4o Mini' },
+                { value: 'openai/gpt-4o', label: '💎 GPT-4o' },
+                { value: 'anthropic/claude-3.5-sonnet', label: '💎 Claude 3.5 Sonnet' }
+            ],
+            puter: [
+                { value: 'grok-beta', label: 'Grok Beta' },
+                { value: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini' }
+            ],
+            openai: [
+                { value: 'gpt-4o', label: 'GPT-4o' },
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+                { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+            ],
+            claude: [
+                { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
+                { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku' }
+            ]
+        };
+
+        // Initialize AI Quick Settings
+        function initAIQuickSettings() {
+            const settingsBtn = document.getElementById('aiSettingsBtn');
+            const quickSettings = document.getElementById('aiQuickSettings');
+            const closeBtn = document.getElementById('aiQuickSettingsClose');
+            const providerSelect = document.getElementById('aiQuickProvider');
+            const modelSelect = document.getElementById('aiQuickModel');
+            const saveBtn = document.getElementById('aiQuickSave');
+
+            if (!settingsBtn || !quickSettings) return;
+
+            settingsBtn.addEventListener('click', () => {
+                const isOpen = quickSettings.style.display === 'block';
+                quickSettings.style.display = isOpen ? 'none' : 'block';
+                if (!isOpen) loadQuickSettings();
+            });
+
+            closeBtn.addEventListener('click', () => {
+                quickSettings.style.display = 'none';
+            });
+
+            providerSelect.addEventListener('change', () => {
+                updateQuickModelSelect(providerSelect.value);
+            });
+
+            saveBtn.addEventListener('click', () => {
+                const provider = providerSelect.value;
+                const model = modelSelect.value;
+                const currentSettings = StorageManager.getAISettings();
+                StorageManager.setAISettings({ ...currentSettings, provider, model });
+                if (window.AIChat) {
+                    AIChat.loadSettings();
+                    AIChat.updateProviderIndicator();
+                }
+                quickSettings.style.display = 'none';
+                App.showToast('AI settings updated!', 'success');
+            });
+        }
+
+        function loadQuickSettings() {
+            const settings = StorageManager.getAISettings();
+            const providerSelect = document.getElementById('aiQuickProvider');
+            if (providerSelect && settings.provider) {
+                providerSelect.value = settings.provider;
+            }
+            updateQuickModelSelect(settings.provider || 'openrouter', settings.model);
+        }
+
+        function updateQuickModelSelect(provider, selectedModel = null) {
+            const modelSelect = document.getElementById('aiQuickModel');
+            if (!modelSelect) return;
+            const models = AI_MODELS[provider] || [];
+            modelSelect.innerHTML = models.map(m =>
+                `<option value="${m.value}" ${selectedModel === m.value ? 'selected' : ''}>${m.label}</option>`
+            ).join('');
+            if (!selectedModel && models.length > 0) {
+                modelSelect.value = models[0].value;
+            }
+        }
+    </script>
+    <script>
+        // #region agent log helper
+        function _dbg(loc,msg,data,hyp){const e={location:loc,message:msg,data:data,timestamp:Date.now(),hypothesisId:hyp};console.log('[DEBUG]',e);try{const l=JSON.parse(localStorage.getItem('rais2_debug_logs')||'[]');l.push(e);localStorage.setItem('rais2_debug_logs',JSON.stringify(l));}catch(x){}}
+        window.getDebugLogs = () => JSON.parse(localStorage.getItem('rais2_debug_logs')||'[]');
+        window.showDebugLogs = () => { const logs = window.getDebugLogs(); console.table(logs); return logs; };
+        // #endregion
+
+        let allItems = [];
+        let selectedItems = new Set();
+        let currentCategory = 'all';
+        let pubYearFilter = localStorage.getItem('rais2_pub_year_filter') || 'all';
+        let pubSortOrder = localStorage.getItem('rais2_pub_sort_order') || 'newest';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadItems();
+            setupEventListeners();
+
+            // Initialize DragDropManager
+            if (window.DragDropManager) {
+                DragDropManager.init({
+                    onOrderChange: () => {
+                        renderSections();
+                        updatePreview();
+                    }
+                });
+            }
+
+            // Initialize BlockManager
+            if (window.BlockManager) {
+                BlockManager.init({
+                    onChange: () => {
+                        renderSections();
+                        updatePreview();
+                    }
+                });
+            }
+
+            // Initialize AI Chat
+            if (window.AIChat) {
+                AIChat.init();
+            }
+            initAIQuickSettings();
+
+            // Initialize newsletter settings
+            initNewsletterSettings();
+
+            // Initialize year filter for publications
+            initYearFilter();
+
+            // Setup new feature listeners (custom items, graphical blocks)
+            setupNewFeatureListeners();
+
+            // Initial render of sections
+            renderSections();
+
+            // Setup drag-drop event delegation (once, not per render)
+            setupDragDropDelegation();
+
+            // Update featured item selector with available items
+            updateFeaturedItemSelector();
+        });
+
+        async function loadItems() {
+            // #region agent log
+            _dbg('builder.html:loadItems:entry','loadItems called',{},'H5');
+            // #endregion
+            const container = document.getElementById('sectionsList');
+            try {
+                const content = await RAIS2Scraper.scrapeAll(true);
+                allItems = RAIS2Scraper.getAllItems(content);
+                // #region agent log
+                _dbg('builder.html:loadItems:afterScrape','Items loaded from scraper',{contentKeys:Object.keys(content),allItemsCount:allItems.length,firstItem:allItems[0]},'H5');
+                // #endregion
+                renderSections();
+            } catch (e) {
+                // #region agent log
+                _dbg('builder.html:loadItems:error','loadItems failed',{error:e.message,stack:e.stack},'H5');
+                // #endregion
+                if (container) {
+                    container.innerHTML = `<div class="alert alert-error" style="margin: var(--spacing-md);">Failed to load content: ${e.message}</div>`;
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            // Item selection in unified panel (using event delegation)
+            document.getElementById('sectionsList').addEventListener('change', (e) => {
+                if (e.target.type === 'checkbox' && e.target.dataset.itemId) {
+                    const itemId = e.target.dataset.itemId;
+
+                    if (e.target.checked) {
+                        selectedItems.add(itemId);
+                    } else {
+                        selectedItems.delete(itemId);
+                    }
+
+                    renderSections();
+                    updatePreview();
+                }
+            });
+
+            // Category tabs
+            document.querySelectorAll('.section-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = tab.dataset.category;
+                    renderSections(); // Render sections for unified panel
+                });
+            });
+
+            // Select all
+            document.getElementById('btnSelectAll').addEventListener('click', () => {
+                let items = currentCategory === 'all' ? allItems : allItems.filter(i => i.category === currentCategory);
+                items.forEach(item => selectedItems.add(item.id));
+                renderSections();
+                updatePreview();
+            });
+
+            // Clear selection
+            document.getElementById('btnSelectNone').addEventListener('click', () => {
+                if (currentCategory === 'all') {
+                    selectedItems.clear();
+                } else {
+                    // Only clear items in current category
+                    allItems.filter(i => i.category === currentCategory).forEach(item => {
+                        selectedItems.delete(item.id);
+                    });
+                }
+                renderSections();
+                updatePreview();
+            });
+
+            // Intro modal buttons
+            const btnEditIntro = document.getElementById('btnEditIntro');
+            if (btnEditIntro) {
+                btnEditIntro.addEventListener('click', openIntroModal);
+            }
+            const btnDeleteIntro = document.getElementById('btnDeleteIntro');
+            if (btnDeleteIntro) {
+                btnDeleteIntro.addEventListener('click', () => {
+                    if (window.BlockManager) {
+                        const intro = window.BlockManager.getNewsletterIntro();
+                        if (intro) deleteIntroBlock(intro.id);
+                    }
+                });
+            }
+            const btnSaveIntro = document.getElementById('btnSaveIntro');
+            if (btnSaveIntro) {
+                btnSaveIntro.addEventListener('click', saveIntro);
+            }
+
+            // Description modal buttons
+            const btnSaveDescription = document.getElementById('btnSaveDescription');
+            if (btnSaveDescription) {
+                btnSaveDescription.addEventListener('click', saveDescription);
+            }
+            const btnClearDesc = document.getElementById('btnClearDesc');
+            if (btnClearDesc) {
+                btnClearDesc.addEventListener('click', clearDescription);
+            }
+
+            // AI generate buttons in modals
+            const btnAIGenerateIntro = document.getElementById('btnAIGenerateIntro');
+            if (btnAIGenerateIntro) {
+                btnAIGenerateIntro.addEventListener('click', () => {
+                    if (window.AIChat) {
+                        const textarea = document.getElementById('introTextarea');
+                        window.AIChat.generateIntro((text) => {
+                            if (textarea) textarea.value = text;
+                        });
+                    } else {
+                        App.showToast('AI not available', 'error');
+                    }
+                });
+            }
+            const btnAIGenerateDesc = document.getElementById('btnAIGenerateDesc');
+            if (btnAIGenerateDesc) {
+                btnAIGenerateDesc.addEventListener('click', () => {
+                    if (window.AIChat && currentDescriptionItemId) {
+                        const item = allItems.find(i => i.id === currentDescriptionItemId);
+                        if (item) {
+                            const textarea = document.getElementById('descriptionTextarea');
+                            window.AIChat.generateItemDescription(item, (text) => {
+                                if (textarea) textarea.value = text;
+                            });
+                        }
+                    } else {
+                        App.showToast('AI not available', 'error');
+                    }
+                });
+            }
+
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Download
+            document.getElementById('btnDownload').addEventListener('click', () => {
+                if (selectedItems.size === 0) {
+                    App.showToast('Select at least one item', 'error');
+                    return;
+                }
+                const items = getSelectedItemObjects();
+                const options = getGenerationOptions();
+                const html = NewsletterGenerator.generate(items, options);
+                NewsletterGenerator.download(html);
+                App.showToast('Newsletter downloaded!', 'success');
+            });
+
+            // Copy
+            document.getElementById('btnCopy').addEventListener('click', async () => {
+                if (selectedItems.size === 0) {
+                    App.showToast('Select at least one item', 'error');
+                    return;
+                }
+                const items = getSelectedItemObjects();
+                const options = getGenerationOptions();
+                const html = NewsletterGenerator.generate(items, options);
+                await NewsletterGenerator.copyToClipboard(html);
+                App.showToast('HTML copied to clipboard!', 'success');
+            });
+
+            // Save
+            document.getElementById('btnSave').addEventListener('click', () => {
+                if (selectedItems.size === 0) {
+                    App.showToast('Select at least one item', 'error');
+                    return;
+                }
+                const items = getSelectedItemObjects();
+                const options = getGenerationOptions();
+                const html = NewsletterGenerator.generate(items, options);
+                NewsletterGenerator.save(items, html);
+                App.showToast('Newsletter saved to archive!', 'success');
+                App.updateNavBadges();
+            });
+
+            // Send
+            document.getElementById('btnSend').addEventListener('click', () => {
+                if (selectedItems.size === 0) {
+                    App.showToast('Select at least one item', 'error');
+                    return;
+                }
+                showSendModal();
+            });
+
+            // Add Newsletter Intro button - opens modal for editing
+            const addIntroBtn = document.getElementById('btnAddIntro');
+            if (addIntroBtn) {
+                addIntroBtn.addEventListener('click', openIntroModal);
+            }
+
+            // Reset Order button
+            const resetOrderBtn = document.getElementById('btnResetOrder');
+            if (resetOrderBtn) {
+                resetOrderBtn.addEventListener('click', () => {
+                    if (confirm('Reset section and item order to default?')) {
+                        if (window.DragDropManager) {
+                            window.DragDropManager.resetOrder();
+                        }
+                        renderSections();
+                        updatePreview();
+                        App.showToast('Order reset to default', 'success');
+                    }
+                });
+            }
+        }
+
+        function getSelectedItemObjects() {
+            // Apply ordering if DragDropManager is available
+            let items = allItems.filter(item => selectedItems.has(item.id));
+            if (window.DragDropManager) {
+                items = DragDropManager.applyOrder(items);
+            }
+            return items;
+        }
+
+        /**
+         * Get generation options for newsletter (section order, item order, custom blocks)
+         */
+        function getGenerationOptions() {
+            // Get newsletter settings
+            const settings = window.StorageManager?.getNewsletterSettings() || {};
+            const showLogoCheckbox = document.getElementById('settingShowLogo');
+            const dividerSelect = document.getElementById('settingDividerStyle');
+            const featuredSelect = document.getElementById('settingFeaturedItem');
+
+            return {
+                sectionOrder: window.DragDropManager?.sectionOrder || ['news', 'event', 'lecture', 'publication', 'member', 'project'],
+                itemOrder: window.DragDropManager?.itemOrder || {},
+                customBlocks: window.BlockManager?.getBlocksForGeneration() || {},
+                customDescriptions: window.StorageManager?.getCustomDescriptions()?.descriptions || {},
+                // New graphical options
+                showLogo: showLogoCheckbox?.checked || false,
+                logoUrl: settings.logoUrl || 'assets/rais2_logo.jpeg',
+                dividerStyle: dividerSelect?.value || 'gradient',
+                featuredItemId: featuredSelect?.value || null
+            };
+        }
+
+        // Global drag state - accessible by both sectionsList and trash zone
+        let currentDragState = {
+            element: null,
+            type: null, // 'item' or 'section'
+            itemId: null,
+            sectionId: null
+        };
+
+        // Auto-scroll state
+        let autoScrollInterval = null;
+        const AUTO_SCROLL_SPEED = 8;
+        const AUTO_SCROLL_THRESHOLD = 60;
+
+        /**
+         * Setup event delegation for drag-drop (avoids memory leaks from repeated listener attachment)
+         */
+        function setupDragDropDelegation() {
+            const container = document.getElementById('sectionsList');
+            if (!container || !window.DragDropManager) return;
+
+            // Track drag state
+            let draggedItem = null;
+            let draggedSection = null;
+            let dropPlaceholder = null;
+            let lastDropTarget = null;
+
+            // Create reusable drop placeholder element
+            function createDropPlaceholder() {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'drop-placeholder';
+                placeholder.innerHTML = '<div class="drop-placeholder-line"></div>';
+                return placeholder;
+            }
+
+            // Remove existing placeholder
+            function removePlaceholder() {
+                if (dropPlaceholder && dropPlaceholder.parentNode) {
+                    dropPlaceholder.parentNode.removeChild(dropPlaceholder);
+                }
+                dropPlaceholder = null;
+                lastDropTarget = null;
+            }
+
+            // Create custom drag ghost
+            function createDragGhost(element) {
+                const ghost = document.createElement('div');
+                ghost.className = 'drag-ghost';
+                ghost.innerHTML = `
+                    <div class="drag-ghost-content">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        <span>${element.querySelector('.ordering-item-title')?.textContent || 'Item'}</span>
+                    </div>
+                `;
+                ghost.style.position = 'absolute';
+                ghost.style.top = '-1000px';
+                ghost.style.left = '-1000px';
+                document.body.appendChild(ghost);
+                return ghost;
+            }
+
+            // Auto-scroll when dragging near edges
+            function handleAutoScroll(clientY) {
+                const containerRect = container.getBoundingClientRect();
+                const topThreshold = containerRect.top + AUTO_SCROLL_THRESHOLD;
+                const bottomThreshold = containerRect.bottom - AUTO_SCROLL_THRESHOLD;
+
+                // Clear any existing auto-scroll
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                    autoScrollInterval = null;
+                }
+
+                if (clientY < topThreshold && container.scrollTop > 0) {
+                    // Scroll up
+                    autoScrollInterval = setInterval(() => {
+                        container.scrollTop -= AUTO_SCROLL_SPEED;
+                        if (container.scrollTop <= 0) {
+                            clearInterval(autoScrollInterval);
+                            autoScrollInterval = null;
+                        }
+                    }, 16);
+                } else if (clientY > bottomThreshold && container.scrollTop < container.scrollHeight - container.clientHeight) {
+                    // Scroll down
+                    autoScrollInterval = setInterval(() => {
+                        container.scrollTop += AUTO_SCROLL_SPEED;
+                        if (container.scrollTop >= container.scrollHeight - container.clientHeight) {
+                            clearInterval(autoScrollInterval);
+                            autoScrollInterval = null;
+                        }
+                    }, 16);
+                }
+            }
+
+            // Stop auto-scroll
+            function stopAutoScroll() {
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                    autoScrollInterval = null;
+                }
+            }
+
+            // Mousedown - prepare for drag (only from drag handle)
+            container.addEventListener('mousedown', (e) => {
+                const handle = e.target.closest('.drag-handle');
+                if (handle) {
+                    const item = handle.closest('.ordering-item[data-item-id]');
+                    if (item && item.classList.contains('selected')) {
+                        // Mark item as ready to drag
+                        item.dataset.readyToDrag = 'true';
+                    }
+                }
+            });
+
+            // Item drag start
+            container.addEventListener('dragstart', (e) => {
+                const item = e.target.closest('.ordering-item[data-item-id]');
+
+                if (item) {
+                    // Only allow drag if initiated from drag handle
+                    if (item.dataset.readyToDrag !== 'true') {
+                        e.preventDefault();
+                        return;
+                    }
+                    delete item.dataset.readyToDrag;
+
+                    draggedItem = item;
+                    draggedSection = null;
+
+                    // Create custom drag ghost
+                    const ghost = createDragGhost(item);
+                    e.dataTransfer.setDragImage(ghost, 20, 20);
+                    setTimeout(() => ghost.remove(), 0);
+
+                    item.classList.add('dragging');
+                    container.classList.add('is-dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        type: 'item',
+                        itemId: item.dataset.itemId,
+                        sectionId: item.dataset.sectionId
+                    }));
+
+                    // Update global state for trash zone
+                    currentDragState = {
+                        element: item,
+                        type: 'item',
+                        itemId: item.dataset.itemId,
+                        sectionId: item.dataset.sectionId
+                    };
+
+                    // Show trash zone as active drop target
+                    const trashZone = document.getElementById('trashDropZone');
+                    if (trashZone) {
+                        trashZone.classList.add('active');
+                    }
+                    return;
+                }
+
+                const sectionHeader = e.target.closest('.ordering-section-header');
+                if (sectionHeader) {
+                    const section = sectionHeader.closest('.ordering-section');
+                    if (section) {
+                        draggedSection = section;
+                        draggedItem = null;
+                        section.classList.add('dragging');
+                        container.classList.add('is-dragging-section');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                            type: 'section',
+                            sectionId: section.dataset.sectionId
+                        }));
+
+                        // Update global state
+                        currentDragState = {
+                            element: section,
+                            type: 'section',
+                            itemId: null,
+                            sectionId: section.dataset.sectionId
+                        };
+                    }
+                }
+            });
+
+            // Drag over - show drop indicators
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+
+                // Handle auto-scroll
+                handleAutoScroll(e.clientY);
+
+                // Handle item drag over
+                if (draggedItem) {
+                    const targetItem = e.target.closest('.ordering-item[data-item-id]');
+                    const targetSection = e.target.closest('.ordering-items');
+
+                    if (targetItem && targetItem !== draggedItem) {
+                        const rect = targetItem.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        const insertBefore = e.clientY < midY;
+
+                        // Only update if target changed or position changed
+                        const positionKey = `${targetItem.dataset.itemId}-${insertBefore ? 'before' : 'after'}`;
+                        if (lastDropTarget !== positionKey) {
+                            lastDropTarget = positionKey;
+
+                            // Remove existing placeholder
+                            removePlaceholder();
+
+                            // Create and insert new placeholder
+                            dropPlaceholder = createDropPlaceholder();
+                            if (insertBefore) {
+                                targetItem.parentNode.insertBefore(dropPlaceholder, targetItem);
+                            } else {
+                                targetItem.parentNode.insertBefore(dropPlaceholder, targetItem.nextSibling);
+                            }
+
+                            // Highlight target item
+                            container.querySelectorAll('.ordering-item').forEach(item => {
+                                item.classList.remove('drop-target');
+                            });
+                            targetItem.classList.add('drop-target');
+                        }
+                    } else if (targetSection && !targetItem) {
+                        // Dropped in empty section or at the end
+                        const positionKey = `section-${targetSection.dataset.sectionId}`;
+                        if (lastDropTarget !== positionKey) {
+                            lastDropTarget = positionKey;
+                            removePlaceholder();
+                            dropPlaceholder = createDropPlaceholder();
+                            targetSection.appendChild(dropPlaceholder);
+                        }
+                    }
+                }
+
+                // Handle section drag over
+                if (draggedSection) {
+                    const targetSection = e.target.closest('.ordering-section');
+                    if (targetSection && targetSection !== draggedSection) {
+                        container.querySelectorAll('.ordering-section').forEach(s => {
+                            s.classList.remove('drag-over', 'drop-above-section', 'drop-below-section');
+                        });
+
+                        const rect = targetSection.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        if (e.clientY < midY) {
+                            targetSection.classList.add('drop-above-section');
+                        } else {
+                            targetSection.classList.add('drop-below-section');
+                        }
+                        targetSection.classList.add('drag-over');
+                    }
+                }
+            });
+
+            // Drag leave - clean up when leaving container
+            container.addEventListener('dragleave', (e) => {
+                const relatedTarget = e.relatedTarget;
+                if (!relatedTarget || !container.contains(relatedTarget)) {
+                    removePlaceholder();
+                    container.querySelectorAll('.drop-target, .drag-over, .drop-above-section, .drop-below-section').forEach(el => {
+                        el.classList.remove('drop-target', 'drag-over', 'drop-above-section', 'drop-below-section');
+                    });
+                    stopAutoScroll();
+                }
+            });
+
+            // Drop - perform the move
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                stopAutoScroll();
+
+                // Clean up visual indicators
+                removePlaceholder();
+                container.querySelectorAll('.drop-target, .drag-over, .dragging, .drop-above-section, .drop-below-section').forEach(el => {
+                    el.classList.remove('drop-target', 'drag-over', 'dragging', 'drop-above-section', 'drop-below-section');
+                });
+                container.classList.remove('is-dragging', 'is-dragging-section');
+
+                if (draggedItem) {
+                    const targetItem = e.target.closest('.ordering-item[data-item-id]');
+                    const targetContainer = e.target.closest('.ordering-items');
+
+                    if (targetItem && targetItem !== draggedItem) {
+                        const itemId = draggedItem.dataset.itemId;
+                        const fromSection = draggedItem.dataset.sectionId;
+                        const toSection = targetItem.dataset.sectionId;
+
+                        // Determine insert position
+                        const items = Array.from(targetItem.parentElement.querySelectorAll('.ordering-item:not(.dragging)'));
+                        let targetIndex = items.indexOf(targetItem);
+                        const rect = targetItem.getBoundingClientRect();
+                        if (e.clientY >= rect.top + rect.height / 2) {
+                            targetIndex++;
+                        }
+
+                        window.DragDropManager.moveItem(itemId, fromSection, toSection, targetIndex);
+                        renderSections();
+                        updatePreview();
+                        App.showToast('Item reordered', 'success');
+                    } else if (targetContainer && !targetItem) {
+                        // Dropped in empty section
+                        const itemId = draggedItem.dataset.itemId;
+                        const fromSection = draggedItem.dataset.sectionId;
+                        const toSection = targetContainer.dataset.sectionId;
+
+                        window.DragDropManager.moveItem(itemId, fromSection, toSection, 0);
+                        renderSections();
+                        updatePreview();
+                        App.showToast('Item moved to section', 'success');
+                    }
+                }
+
+                if (draggedSection) {
+                    const targetSection = e.target.closest('.ordering-section');
+                    if (targetSection && targetSection !== draggedSection) {
+                        const sourceSectionId = draggedSection.dataset.sectionId;
+                        const targetSectionId = targetSection.dataset.sectionId;
+
+                        window.DragDropManager.moveSection(sourceSectionId, targetSectionId);
+                        renderSections();
+                        updatePreview();
+                        App.showToast('Section reordered', 'success');
+                    }
+                }
+
+                draggedItem = null;
+                draggedSection = null;
+            });
+
+            // Drag end - clean up
+            container.addEventListener('dragend', (e) => {
+                stopAutoScroll();
+                removePlaceholder();
+                container.querySelectorAll('.drop-target, .drag-over, .dragging, .drop-above-section, .drop-below-section').forEach(el => {
+                    el.classList.remove('drop-target', 'drag-over', 'dragging', 'drop-above-section', 'drop-below-section');
+                });
+                container.classList.remove('is-dragging', 'is-dragging-section');
+                draggedItem = null;
+                draggedSection = null;
+
+                // Clear global state
+                currentDragState = {
+                    element: null,
+                    type: null,
+                    itemId: null,
+                    sectionId: null
+                };
+
+                // Remove trash highlight and active state
+                const trashZone = document.getElementById('trashDropZone');
+                if (trashZone) {
+                    trashZone.classList.remove('drag-over', 'active');
+                }
+            });
+
+            // Setup trash drop zone
+            setupTrashDropZone();
+
+            // Setup keyboard reordering
+            setupKeyboardReordering(container);
+        }
+
+        /**
+         * Setup keyboard reordering (up/down with arrow keys)
+         */
+        function setupKeyboardReordering(container) {
+            container.addEventListener('keydown', (e) => {
+                const item = e.target.closest('.ordering-item[data-item-id]');
+                if (!item || !item.classList.contains('selected')) return;
+
+                const itemId = item.dataset.itemId;
+                const sectionId = item.dataset.sectionId;
+
+                if (e.key === 'ArrowUp' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    moveItemByKeyboard(itemId, sectionId, 'up');
+                } else if (e.key === 'ArrowDown' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    moveItemByKeyboard(itemId, sectionId, 'down');
+                }
+            });
+        }
+
+        /**
+         * Move item up or down using keyboard
+         */
+        function moveItemByKeyboard(itemId, sectionId, direction) {
+            if (!window.DragDropManager) return;
+
+            const order = window.DragDropManager.itemOrder[sectionId] || [];
+            const currentIndex = order.indexOf(itemId);
+
+            if (currentIndex === -1) {
+                // Item not in order array, add it
+                if (direction === 'up') {
+                    order.unshift(itemId);
+                } else {
+                    order.push(itemId);
+                }
+                window.DragDropManager.setItemOrder(sectionId, order);
+            } else {
+                const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+                if (newIndex >= 0 && newIndex < order.length) {
+                    // Swap positions
+                    [order[currentIndex], order[newIndex]] = [order[newIndex], order[currentIndex]];
+                    window.DragDropManager.setItemOrder(sectionId, order);
+                }
+            }
+
+            renderSections();
+            updatePreview();
+
+            // Re-focus the moved item
+            requestAnimationFrame(() => {
+                const movedItem = document.querySelector(`.ordering-item[data-item-id="${itemId}"]`);
+                if (movedItem) {
+                    movedItem.focus();
+                }
+            });
+        }
+
+        /**
+         * Toggle item selection (add/remove from newsletter)
+         */
+        function toggleItemSelection(itemId) {
+            if (selectedItems.has(itemId)) {
+                selectedItems.delete(itemId);
+            } else {
+                selectedItems.add(itemId);
+            }
+            renderSections();
+            updatePreview();
+        }
+
+        /**
+         * Setup trash drop zone for removing items from selection
+         */
+        function setupTrashDropZone() {
+            const trashZone = document.getElementById('trashDropZone');
+            if (!trashZone) return;
+
+            // Counter to handle dragleave flickering when entering child elements
+            let dragEnterCounter = 0;
+
+            trashZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dragEnterCounter++;
+
+                // Only show highlight for items (not sections)
+                if (currentDragState.type === 'item') {
+                    trashZone.classList.add('drag-over');
+                }
+            });
+
+            trashZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Only allow drop for items
+                if (currentDragState.type === 'item') {
+                    e.dataTransfer.dropEffect = 'move';
+                } else {
+                    e.dataTransfer.dropEffect = 'none';
+                }
+            });
+
+            trashZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dragEnterCounter--;
+
+                // Only remove highlight when truly leaving the zone (counter reaches 0)
+                if (dragEnterCounter <= 0) {
+                    dragEnterCounter = 0;
+                    trashZone.classList.remove('drag-over');
+                }
+            });
+
+            trashZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Reset counter and visual state
+                dragEnterCounter = 0;
+                trashZone.classList.remove('drag-over', 'active');
+
+                // First try using global state (most reliable)
+                if (currentDragState.type === 'item' && currentDragState.itemId) {
+                    const itemId = currentDragState.itemId;
+                    selectedItems.delete(itemId);
+
+                    // Clear global state
+                    currentDragState = {
+                        element: null,
+                        type: null,
+                        itemId: null,
+                        sectionId: null
+                    };
+
+                    renderSections();
+                    updatePreview();
+                    App.showToast('Item removed from newsletter', 'info');
+                    return;
+                }
+
+                // Fallback: try dataTransfer
+                try {
+                    const dataStr = e.dataTransfer.getData('text/plain');
+                    if (dataStr) {
+                        const data = JSON.parse(dataStr);
+                        if (data.type === 'item' && data.itemId) {
+                            selectedItems.delete(data.itemId);
+                            renderSections();
+                            updatePreview();
+                            App.showToast('Item removed from newsletter', 'info');
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Failed to parse drop data:', err);
+                }
+            });
+
+            // Also handle document-level dragend to clean up
+            document.addEventListener('dragend', () => {
+                dragEnterCounter = 0;
+                trashZone.classList.remove('drag-over', 'active');
+            });
+        }
+
+        /**
+         * Render the sections in the unified content panel
+         * Shows ALL items with checkboxes for selection
+         * Selected items are draggable and can be reordered
+         */
+        function renderSections() {
+            const container = document.getElementById('sectionsList');
+            if (!container) return;
+
+            const sectionOrder = window.DragDropManager ? DragDropManager.sectionOrder : ['news', 'event', 'lecture', 'publication', 'member', 'project'];
+            const sectionNames = {
+                news: 'News',
+                event: 'Events',
+                lecture: 'Lectures',
+                publication: 'Publications',
+                member: 'Members',
+                project: 'Projects'
+            };
+            const sectionIcons = {
+                news: '<path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>',
+                event: '<path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>',
+                lecture: '<path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>',
+                publication: '<path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>',
+                member: '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>',
+                project: '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>'
+            };
+
+            // Update year filter visibility based on current category
+            updateYearFilterVisibility();
+
+            // Get items grouped by category, filtered by current tab
+            const itemsByCategory = {};
+            allItems.forEach(item => {
+                // Filter by current category tab
+                if (currentCategory === 'csv') {
+                    // CSV tab: show only CSV-sourced items
+                    if (!item.isCSV) return;
+                } else if (currentCategory !== 'all' && item.category !== currentCategory) {
+                    return;
+                }
+
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
+            });
+
+            // Apply year filter and sort for publications
+            if (itemsByCategory['publication']) {
+                let publications = itemsByCategory['publication'];
+                publications = filterPublicationsByYear(publications);
+                publications = sortPublications(publications);
+                itemsByCategory['publication'] = publications;
+            }
+
+            // Update newsletter intro section visibility
+            updateIntroSectionVisibility();
+
+            // Apply item order if available
+            sectionOrder.forEach(sectionId => {
+                if (itemsByCategory[sectionId] && window.DragDropManager?.itemOrder?.[sectionId]) {
+                    const order = window.DragDropManager.itemOrder[sectionId];
+                    itemsByCategory[sectionId].sort((a, b) => {
+                        const indexA = order.indexOf(a.id);
+                        const indexB = order.indexOf(b.id);
+                        if (indexA === -1 && indexB === -1) return 0;
+                        if (indexA === -1) return 1;
+                        if (indexB === -1) return -1;
+                        return indexA - indexB;
+                    });
+                }
+            });
+
+            // Get custom descriptions
+            const customDescs = window.StorageManager?.getCustomDescriptions()?.descriptions || {};
+
+            // Render sections
+            let sectionsHtml = sectionOrder.map(sectionId => {
+                const items = itemsByCategory[sectionId] || [];
+                if (items.length === 0) return ''; // Skip empty sections
+
+                const selectedCount = items.filter(item => selectedItems.has(item.id)).length;
+
+                return `
+                    <div class="ordering-section" data-section-id="${sectionId}">
+                        <div class="ordering-section-header" draggable="true">
+                            <div class="ordering-section-title">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">${sectionIcons[sectionId]}</svg>
+                                ${sectionNames[sectionId]}
+                            </div>
+                            <span class="ordering-section-count">${selectedCount} / ${items.length}</span>
+                        </div>
+                        <div class="ordering-items" data-section-id="${sectionId}">
+                            ${items.map((item, index) => {
+                                const isSelected = selectedItems.has(item.id);
+                                const isNew = !StorageManager.isItemSeen(item.id);
+                                const hasCustomDesc = !!customDescs[item.id];
+                                const selectedInSection = items.filter(i => selectedItems.has(i.id));
+                                const selectedIndex = selectedInSection.findIndex(i => i.id === item.id);
+                                const isFirst = selectedIndex === 0;
+                                const isLast = selectedIndex === selectedInSection.length - 1;
+
+                                return `
+                                <div class="ordering-item ${isSelected ? 'selected' : ''}"
+                                     data-item-id="${item.id}"
+                                     data-section-id="${sectionId}"
+                                     draggable="true"
+                                     tabindex="0">
+                                    <!-- Selection toggle button -->
+                                    <button class="item-select-btn ${isSelected ? 'selected' : ''}"
+                                            onclick="toggleItemSelection('${item.id}')"
+                                            title="${isSelected ? 'Remove from newsletter' : 'Add to newsletter'}">
+                                        ${isSelected
+                                            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+                                            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>'
+                                        }
+                                    </button>
+
+                                    <!-- Drag handle (visible for selected items) -->
+                                    ${isSelected ? `
+                                    <div class="drag-handle" title="Drag to reorder">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                        </svg>
+                                    </div>
+                                    ` : ''}
+
+                                    <!-- Item content -->
+                                    <div class="ordering-item-content" onclick="toggleItemSelection('${item.id}')">
+                                        <div class="ordering-item-title">
+                                            ${App.escapeHtml(item.title)}
+                                            ${isNew ? '<span class="new-badge">New</span>' : ''}
+                                            ${item.isCustom ? '<span class="custom-item-badge">Custom</span>' : ''}
+                                            ${item.isCSV ? '<span class="csv-item-badge">CSV</span>' : ''}
+                                        </div>
+                                        <div class="ordering-item-meta">
+                                            ${NewsletterGenerator.formatDate(item.date)}
+                                            ${hasCustomDesc ? '<span class="has-desc-badge">✎ Custom</span>' : ''}
+                                        </div>
+                                        ${item.isCSV && item.generatedText ? `
+                                        <div class="csv-generated-preview" style="margin-top: 6px;">
+                                            <details onclick="event.stopPropagation()">
+                                                <summary style="cursor: pointer; font-size: 11px; color: var(--text-secondary); user-select: none;">View generated text</summary>
+                                                <div style="margin-top: 4px; padding: 8px; background: var(--bg-tertiary, rgba(0,146,96,0.05)); border-radius: 4px; white-space: pre-wrap; font-size: 11px; max-height: 120px; overflow-y: auto; line-height: 1.4; color: var(--text-secondary);">${(item.generatedText.en?.plain || item.generatedText.de?.plain || 'No text generated').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                                            </details>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <!-- Actions (always visible) -->
+                                    <div class="ordering-item-actions">
+                                        <!-- Edit description - always available -->
+                                        <button class="ordering-item-btn ${hasCustomDesc ? 'has-content' : ''}"
+                                                onclick="event.stopPropagation(); openDescriptionModal('${item.id}')"
+                                                title="${hasCustomDesc ? 'Edit custom description' : 'Add custom description'}">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                        </button>
+
+                                        ${isSelected ? `
+                                        <!-- Move buttons - only for selected -->
+                                        <div class="move-buttons-inline">
+                                            <button class="move-btn-sm ${isFirst ? 'disabled' : ''}"
+                                                    onclick="event.stopPropagation(); moveItemByKeyboard('${item.id}', '${sectionId}', 'up')"
+                                                    title="Move up"
+                                                    ${isFirst ? 'disabled' : ''}>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+                                            </button>
+                                            <button class="move-btn-sm ${isLast ? 'disabled' : ''}"
+                                                    onclick="event.stopPropagation(); moveItemByKeyboard('${item.id}', '${sectionId}', 'down')"
+                                                    title="Move down"
+                                                    ${isLast ? 'disabled' : ''}>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+                                            </button>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (!sectionsHtml) {
+                sectionsHtml = `<div class="ordering-empty"><p>No content available for this category</p></div>`;
+            }
+
+            container.innerHTML = sectionsHtml;
+        }
+
+        /**
+         * Update intro section visibility based on BlockManager state
+         */
+        function updateIntroSectionVisibility() {
+            const introSection = document.getElementById('newsletterIntroSection');
+            const addIntroSection = document.getElementById('addIntroSection');
+            const introContent = document.getElementById('introBlockContent');
+
+            if (!introSection || !addIntroSection) return;
+
+            if (window.BlockManager) {
+                const intro = window.BlockManager.getNewsletterIntro();
+                if (intro) {
+                    introSection.style.display = 'block';
+                    addIntroSection.style.display = 'none';
+                    if (introContent) {
+                        introContent.textContent = intro.content || 'Click edit to add introduction text...';
+                    }
+                } else {
+                    introSection.style.display = 'none';
+                    addIntroSection.style.display = 'block';
+                }
+            }
+        }
+
+        /**
+         * Remove item from selection
+         */
+        function removeFromSelection(itemId) {
+            selectedItems.delete(itemId);
+            renderSections();
+            updatePreview();
+        }
+
+        /**
+         * Generate AI description for an item
+         */
+        function generateDescription(itemId) {
+            const item = allItems.find(i => i.id === itemId);
+            if (item && window.AIChat) {
+                window.AIChat.generateItemDescription(item);
+            }
+        }
+
+        // ============ INTRO MODAL FUNCTIONS ============
+
+        let currentIntroBlockId = null;
+
+        /**
+         * Open intro modal for editing
+         */
+        function openIntroModal() {
+            const modal = document.getElementById('introModal');
+            const textarea = document.getElementById('introTextarea');
+            if (!modal || !textarea) return;
+
+            // Get existing intro content
+            if (window.BlockManager) {
+                const intro = window.BlockManager.getNewsletterIntro();
+                if (intro) {
+                    currentIntroBlockId = intro.id;
+                    textarea.value = intro.content || '';
+                } else {
+                    currentIntroBlockId = null;
+                    textarea.value = '';
+                }
+            }
+
+            modal.classList.add('active');
+            textarea.focus();
+        }
+
+        /**
+         * Close intro modal
+         */
+        function closeIntroModal() {
+            const modal = document.getElementById('introModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            currentIntroBlockId = null;
+        }
+
+        /**
+         * Save intro from modal
+         */
+        function saveIntro() {
+            const textarea = document.getElementById('introTextarea');
+            if (!textarea || !window.BlockManager) return;
+
+            const content = textarea.value.trim();
+
+            if (currentIntroBlockId) {
+                // Update existing block
+                window.BlockManager.updateBlock(currentIntroBlockId, { content });
+            } else if (content) {
+                // Create new block
+                window.BlockManager.createBlock(window.BlockManager.TYPES.NEWSLETTER_INTRO, {
+                    title: 'Newsletter Introduction',
+                    content
+                });
+            }
+
+            closeIntroModal();
+            renderSections();
+            updatePreview();
+            App.showToast('Introduction saved!', 'success');
+        }
+
+        /**
+         * Edit intro block (called from button click)
+         */
+        function editIntroBlock(blockId) {
+            openIntroModal();
+        }
+
+        /**
+         * Delete intro block
+         */
+        function deleteIntroBlock(blockId) {
+            if (!window.BlockManager) return;
+            if (confirm('Remove the newsletter introduction?')) {
+                window.BlockManager.deleteBlock(blockId);
+                renderSections();
+                updatePreview();
+                App.showToast('Introduction removed', 'success');
+            }
+        }
+
+        // ============ DESCRIPTION MODAL FUNCTIONS ============
+
+        let currentDescriptionItemId = null;
+
+        /**
+         * Open description modal for editing
+         */
+        function openDescriptionModal(itemId) {
+            const modal = document.getElementById('descriptionModal');
+            const textarea = document.getElementById('descriptionTextarea');
+            const titleEl = document.getElementById('descriptionItemTitle');
+            if (!modal || !textarea) return;
+
+            currentDescriptionItemId = itemId;
+
+            // Find the item
+            const item = allItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            // Set title
+            if (titleEl) {
+                titleEl.textContent = `Custom description for: ${item.title}`;
+            }
+
+            // Get existing custom description
+            const customDesc = window.StorageManager?.getCustomDescription(itemId);
+            textarea.value = customDesc || '';
+
+            modal.classList.add('active');
+            textarea.focus();
+        }
+
+        /**
+         * Close description modal
+         */
+        function closeDescriptionModal() {
+            const modal = document.getElementById('descriptionModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            currentDescriptionItemId = null;
+        }
+
+        /**
+         * Save description from modal
+         */
+        function saveDescription() {
+            const textarea = document.getElementById('descriptionTextarea');
+            if (!textarea || !currentDescriptionItemId || !window.StorageManager) return;
+
+            const content = textarea.value.trim();
+
+            if (content) {
+                window.StorageManager.setCustomDescription(currentDescriptionItemId, content);
+            } else {
+                // Clear description if empty
+                const data = window.StorageManager.getCustomDescriptions();
+                delete data.descriptions[currentDescriptionItemId];
+                window.StorageManager.set(window.StorageManager.KEYS.CUSTOM_DESCRIPTIONS, data);
+            }
+
+            closeDescriptionModal();
+            renderSections();
+            updatePreview();
+            App.showToast('Description saved!', 'success');
+        }
+
+        /**
+         * Clear description in modal
+         */
+        function clearDescription() {
+            const textarea = document.getElementById('descriptionTextarea');
+            if (textarea) {
+                textarea.value = '';
+            }
+        }
+
+        function updatePreview() {
+            const count = selectedItems.size;
+            document.getElementById('selectedCount').textContent = `${count} item${count !== 1 ? 's' : ''} selected`;
+
+            // Update featured item selector with current selected items
+            updateFeaturedItemSelector();
+
+            const frame = document.getElementById('previewFrame');
+
+            if (count === 0) {
+                frame.srcdoc = `<html><body style='font-family: sans-serif; color: #7F8990; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;'><p>Select items to preview newsletter</p></body></html>`;
+                return;
+            }
+
+            const items = getSelectedItemObjects();
+            const options = getGenerationOptions();
+            const html = NewsletterGenerator.generate(items, options);
+            frame.srcdoc = html;
+        }
+
+        function showSendModal() {
+            const subscribers = SubscriberManager.getActive();
+            const isConfigured = EmailService.isConfigured();
+
+            let content = '';
+
+            if (!isConfigured) {
+                content = `
+                    <div class="alert alert-warning">
+                        <strong>EmailJS not configured.</strong>
+                        <p>Please configure your email settings first.</p>
+                        <a href="settings.html" class="btn btn-primary mt-lg">Go to Settings</a>
+                    </div>
+                `;
+            } else if (subscribers.length === 0) {
+                content = `
+                    <div class="alert alert-warning">
+                        <strong>No subscribers.</strong>
+                        <p>Add subscribers before sending.</p>
+                        <a href="subscribers.html" class="btn btn-primary mt-lg">Manage Subscribers</a>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <p>Ready to send newsletter to <strong>${subscribers.length}</strong> subscriber${subscribers.length !== 1 ? 's' : ''}.</p>
+                    <div class="form-group mt-lg">
+                        <label class="form-label">Subject (optional)</label>
+                        <input type="text" class="form-input" id="emailSubject" placeholder="RAIS² Newsletter - ${new Date().toLocaleDateString('en-US', {month: 'long', year: 'numeric'})}">
+                    </div>
+                    <div id="sendProgress" class="mt-lg" style="display:none;">
+                        <div style="background:#EBEBE4;height:20px;border-radius:10px;overflow:hidden;">
+                            <div id="progressBar" style="background:#009260;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                        <p class="text-muted mt-lg" id="progressText">Sending...</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="App.closeModal('sendModal')">Cancel</button>
+                        <button class="btn btn-primary" id="btnConfirmSend">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            Send Now
+                        </button>
+                    </div>
+                `;
+            }
+
+            document.getElementById('sendModalBody').innerHTML = content;
+            App.openModal('sendModal');
+
+            // Setup send button
+            const confirmBtn = document.getElementById('btnConfirmSend');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', sendNewsletter);
+            }
+        }
+
+        async function sendNewsletter() {
+            const items = getSelectedItemObjects();
+            const options = getGenerationOptions();
+            const html = NewsletterGenerator.generate(items, options);
+            const subject = document.getElementById('emailSubject').value || null;
+
+            document.getElementById('btnConfirmSend').disabled = true;
+            document.getElementById('sendProgress').style.display = 'block';
+
+            const result = await EmailService.sendNewsletter(html, subject, (progress) => {
+                const pct = Math.round((progress.current / progress.total) * 100);
+                document.getElementById('progressBar').style.width = pct + '%';
+                document.getElementById('progressText').textContent = `Sending to ${progress.email}... (${progress.current}/${progress.total})`;
+            });
+
+            if (result.success) {
+                // Mark items as seen
+                StorageManager.markItemsSeen(items);
+
+                // Save to archive
+                StorageManager.saveNewsletter({
+                    title: subject || `Newsletter - ${new Date().toLocaleDateString()}`,
+                    html,
+                    items: items.map(i => i.id)
+                });
+
+                // Update the newsletter with sent info
+                const newsletters = StorageManager.getNewsletters();
+                if (newsletters.newsletters.length > 0) {
+                    newsletters.newsletters[0].sentAt = new Date().toISOString();
+                    newsletters.newsletters[0].recipientCount = result.sent;
+                    StorageManager.set(StorageManager.KEYS.NEWSLETTERS, newsletters);
+                }
+
+                document.getElementById('sendModalBody').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>Newsletter sent!</strong>
+                        <p>Successfully sent to ${result.sent} of ${result.total} subscribers.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="App.closeModal('sendModal')">Done</button>
+                    </div>
+                `;
+
+                App.showToast('Newsletter sent successfully!', 'success');
+            } else {
+                document.getElementById('sendModalBody').innerHTML = `
+                    <div class="alert alert-error">
+                        <strong>Failed to send newsletter.</strong>
+                        <p>${result.error || 'Unknown error'}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="App.closeModal('sendModal')">Close</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ============ CUSTOM ITEM MODAL FUNCTIONS ============
+
+        let currentCustomItemType = 'event';
+
+        function openCustomItemModal() {
+            const modal = document.getElementById('customItemModal');
+            if (!modal) return;
+
+            // Reset form
+            document.getElementById('customItemTitle').value = '';
+            document.getElementById('customItemSummary').value = '';
+            document.getElementById('customItemDate').value = window.CustomItemManager?.getTodayFormatted() || '';
+            document.getElementById('customItemUrl').value = '';
+            document.getElementById('customItemTime').value = '';
+            document.getElementById('customItemLocation').value = '';
+            document.getElementById('customItemSpeaker').value = '';
+
+            // Reset type selection
+            selectCustomItemType('event');
+
+            modal.classList.add('active');
+            document.getElementById('customItemTitle').focus();
+        }
+
+        function closeCustomItemModal() {
+            const modal = document.getElementById('customItemModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function selectCustomItemType(type) {
+            currentCustomItemType = type;
+
+            // Update button states
+            document.querySelectorAll('.custom-item-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+
+            // Show/hide event-specific fields
+            const eventFields = document.getElementById('eventFields');
+            if (eventFields) {
+                eventFields.classList.toggle('visible', type === 'event');
+            }
+        }
+
+        function saveCustomItem() {
+            if (!window.CustomItemManager) {
+                App.showToast('Custom item manager not available', 'error');
+                return;
+            }
+
+            const title = document.getElementById('customItemTitle').value.trim();
+            const summary = document.getElementById('customItemSummary').value.trim();
+            const date = document.getElementById('customItemDate').value.trim();
+            const url = document.getElementById('customItemUrl').value.trim();
+
+            // Validate
+            const validation = window.CustomItemManager.validateItem({ title, url });
+            if (!validation.valid) {
+                App.showToast(validation.errors[0], 'error');
+                return;
+            }
+
+            // Build item data
+            const itemData = { title, summary, date, url };
+
+            // Add event-specific fields
+            if (currentCustomItemType === 'event') {
+                itemData.time = document.getElementById('customItemTime').value.trim();
+                itemData.location = document.getElementById('customItemLocation').value.trim();
+                itemData.speaker = document.getElementById('customItemSpeaker').value.trim();
+            }
+
+            // Create the item
+            const newItem = window.CustomItemManager.createItem(currentCustomItemType, itemData);
+
+            // Add to allItems array and select it
+            allItems.push(newItem);
+            selectedItems.add(newItem.id);
+
+            closeCustomItemModal();
+            renderSections();
+            updatePreview();
+            updateFeaturedItemSelector();
+            App.showToast('Custom item added!', 'success');
+        }
+
+        // ============ NEWSLETTER SETTINGS FUNCTIONS ============
+
+        function initNewsletterSettings() {
+            const settings = window.StorageManager?.getNewsletterSettings() || {};
+
+            // Initialize checkboxes and selects
+            const showLogoCheckbox = document.getElementById('settingShowLogo');
+            const dividerSelect = document.getElementById('settingDividerStyle');
+
+            if (showLogoCheckbox) {
+                showLogoCheckbox.checked = settings.showLogo || false;
+                showLogoCheckbox.addEventListener('change', () => {
+                    saveNewsletterSettings();
+                    updatePreview();
+                });
+            }
+
+            if (dividerSelect) {
+                dividerSelect.value = settings.dividerStyle || 'gradient';
+                dividerSelect.addEventListener('change', () => {
+                    saveNewsletterSettings();
+                    updatePreview();
+                });
+            }
+
+            // Settings toggle
+            const settingsToggle = document.getElementById('settingsToggle');
+            const settingsBody = document.getElementById('settingsBody');
+            if (settingsToggle && settingsBody) {
+                settingsToggle.addEventListener('click', () => {
+                    settingsBody.classList.toggle('collapsed');
+                    settingsToggle.classList.toggle('collapsed');
+                });
+            }
+        }
+
+        function saveNewsletterSettings() {
+            if (!window.StorageManager) return;
+
+            const showLogo = document.getElementById('settingShowLogo')?.checked || false;
+            const dividerStyle = document.getElementById('settingDividerStyle')?.value || 'gradient';
+            const featuredItemId = document.getElementById('settingFeaturedItem')?.value || null;
+
+            window.StorageManager.setNewsletterSettings({
+                showLogo,
+                dividerStyle,
+                featuredItemId
+            });
+        }
+
+        function updateFeaturedItemSelector() {
+            const select = document.getElementById('settingFeaturedItem');
+            if (!select) return;
+
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">None</option>';
+
+            // Add selected items as options
+            const selectedItemObjects = allItems.filter(item => selectedItems.has(item.id));
+            selectedItemObjects.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.title.substring(0, 50) + (item.title.length > 50 ? '...' : '');
+                if (item.id === currentValue) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            // Add change listener
+            select.removeEventListener('change', handleFeaturedItemChange);
+            select.addEventListener('change', handleFeaturedItemChange);
+        }
+
+        function handleFeaturedItemChange() {
+            saveNewsletterSettings();
+            updatePreview();
+        }
+
+        // ============ YEAR FILTER FUNCTIONS (Publications) ============
+
+        /**
+         * Initialize year filter chips and sort dropdown for publications
+         */
+        function initYearFilter() {
+            const yearFilterEl = document.getElementById('yearFilter');
+            const sortSelect = document.getElementById('pubSortOrder');
+
+            if (!yearFilterEl) return;
+
+            // Restore saved values
+            if (sortSelect) {
+                sortSelect.value = pubSortOrder;
+            }
+
+            // Mark active chip
+            yearFilterEl.querySelectorAll('.year-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.year === pubYearFilter);
+            });
+
+            // Year chip click handlers
+            yearFilterEl.querySelectorAll('.year-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    pubYearFilter = chip.dataset.year;
+                    localStorage.setItem('rais2_pub_year_filter', pubYearFilter);
+
+                    // Update active state
+                    yearFilterEl.querySelectorAll('.year-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+
+                    renderSections();
+                });
+            });
+
+            // Sort dropdown change handler
+            if (sortSelect) {
+                sortSelect.addEventListener('change', () => {
+                    pubSortOrder = sortSelect.value;
+                    localStorage.setItem('rais2_pub_sort_order', pubSortOrder);
+                    renderSections();
+                });
+            }
+        }
+
+        /**
+         * Update year filter visibility based on current category
+         */
+        function updateYearFilterVisibility() {
+            const yearFilterEl = document.getElementById('yearFilter');
+            if (!yearFilterEl) return;
+
+            // Show year filter only when viewing publications
+            yearFilterEl.style.display = currentCategory === 'publication' ? 'flex' : 'none';
+        }
+
+        /**
+         * Filter publications by year
+         * @param {Array} items - Publication items to filter
+         * @returns {Array} Filtered items
+         */
+        function filterPublicationsByYear(items) {
+            if (pubYearFilter === 'all') return items;
+
+            return items.filter(item => {
+                // Extract year from date field
+                let year;
+                if (item.date.includes('.')) {
+                    // Format: DD.MM.YYYY
+                    year = parseInt(item.date.split('.')[2], 10);
+                } else {
+                    // Format: YYYY or just year string
+                    year = parseInt(item.date, 10);
+                }
+
+                if (pubYearFilter === 'earlier') {
+                    return year < 2022;
+                }
+
+                return year === parseInt(pubYearFilter, 10);
+            });
+        }
+
+        /**
+         * Sort publications based on current sort order
+         * @param {Array} items - Publication items to sort
+         * @returns {Array} Sorted items
+         */
+        function sortPublications(items) {
+            const sorted = [...items];
+
+            switch (pubSortOrder) {
+                case 'oldest':
+                    sorted.sort((a, b) => {
+                        const yearA = a.date.includes('.') ? parseInt(a.date.split('.')[2], 10) : parseInt(a.date, 10);
+                        const yearB = b.date.includes('.') ? parseInt(b.date.split('.')[2], 10) : parseInt(b.date, 10);
+                        if (yearA !== yearB) return yearA - yearB;
+                        return (a.erefId || 0) - (b.erefId || 0);
+                    });
+                    break;
+
+                case 'title':
+                    sorted.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+
+                case 'newest':
+                default:
+                    sorted.sort((a, b) => {
+                        const yearA = a.date.includes('.') ? parseInt(a.date.split('.')[2], 10) : parseInt(a.date, 10);
+                        const yearB = b.date.includes('.') ? parseInt(b.date.split('.')[2], 10) : parseInt(b.date, 10);
+                        if (yearA !== yearB) return yearB - yearA;
+                        return (b.erefId || 0) - (a.erefId || 0);
+                    });
+                    break;
+            }
+
+            return sorted;
+        }
+
+        // ============ GRAPHICAL BLOCK MODAL FUNCTIONS ============
+
+        let selectedBlockType = null;
+
+        function openGraphicalBlockModal() {
+            const modal = document.getElementById('graphicalBlockModal');
+            if (!modal) return;
+
+            // Reset selection
+            selectedBlockType = null;
+            document.querySelectorAll('.block-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('blockFieldsContainer').style.display = 'none';
+            document.getElementById('blockFieldsContainer').innerHTML = '';
+            document.getElementById('btnSaveGraphicalBlock').disabled = true;
+
+            modal.classList.add('active');
+        }
+
+        function closeGraphicalBlockModal() {
+            const modal = document.getElementById('graphicalBlockModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function selectBlockType(type) {
+            selectedBlockType = type;
+
+            // Update card selection
+            document.querySelectorAll('.block-type-card').forEach(card => {
+                card.classList.toggle('selected', card.dataset.blockType === type);
+            });
+
+            // Show form fields for the selected type
+            showBlockFields(type);
+            document.getElementById('btnSaveGraphicalBlock').disabled = false;
+        }
+
+        function showBlockFields(type) {
+            const container = document.getElementById('blockFieldsContainer');
+            container.style.display = 'block';
+
+            let fieldsHtml = '';
+
+            switch (type) {
+                case 'image':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="form-group">
+                                <label class="form-label">Image URL *</label>
+                                <input type="text" class="form-input" id="blockImageUrl" placeholder="https://...">
+                            </div>
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Alt Text</label>
+                                    <input type="text" class="form-input" id="blockImageAlt" placeholder="Image description">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Link URL (optional)</label>
+                                    <input type="text" class="form-input" id="blockImageLink" placeholder="https://...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Caption</label>
+                                <input type="text" class="form-input" id="blockImageCaption" placeholder="Image caption">
+                            </div>
+                        </div>`;
+                    break;
+
+                case 'cta-button':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Button Text *</label>
+                                    <input type="text" class="form-input" id="blockButtonText" placeholder="Learn More">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Link URL *</label>
+                                    <input type="text" class="form-input" id="blockButtonLink" placeholder="https://...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Style</label>
+                                <select class="form-input" id="blockButtonVariant">
+                                    <option value="primary">Primary (Green)</option>
+                                    <option value="secondary">Secondary (Outline)</option>
+                                    <option value="outline">Outline (Gray)</option>
+                                </select>
+                            </div>
+                        </div>`;
+                    break;
+
+                case 'quote':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="form-group">
+                                <label class="form-label">Quote Text *</label>
+                                <textarea class="form-textarea" id="blockQuoteText" rows="3" placeholder="Enter the quote..."></textarea>
+                            </div>
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Author</label>
+                                    <input type="text" class="form-input" id="blockQuoteAuthor" placeholder="Prof. Dr. Example">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Role/Title</label>
+                                    <input type="text" class="form-input" id="blockQuoteRole" placeholder="Director of RAIS²">
+                                </div>
+                            </div>
+                        </div>`;
+                    break;
+
+                case 'feature-box':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Heading *</label>
+                                    <input type="text" class="form-input" id="blockFeatureHeading" placeholder="Feature Title">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Icon</label>
+                                    <select class="form-input" id="blockFeatureIcon">
+                                        <option value="star">Star</option>
+                                        <option value="check">Checkmark</option>
+                                        <option value="info">Info</option>
+                                        <option value="calendar">Calendar</option>
+                                        <option value="link">Link</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea" id="blockFeatureDesc" rows="2" placeholder="Brief description..."></textarea>
+                            </div>
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Link URL (optional)</label>
+                                    <input type="text" class="form-input" id="blockFeatureLink" placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Link Text</label>
+                                    <input type="text" class="form-input" id="blockFeatureLinkText" placeholder="Learn more" value="Learn more">
+                                </div>
+                            </div>
+                        </div>`;
+                    break;
+
+                case 'divider':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="form-group">
+                                <label class="form-label">Divider Style</label>
+                                <select class="form-input" id="blockDividerStyle">
+                                    <option value="gradient">Gradient</option>
+                                    <option value="solid">Solid Line</option>
+                                    <option value="dots">Dots</option>
+                                    <option value="wave">Wave</option>
+                                </select>
+                            </div>
+                        </div>`;
+                    break;
+
+                case 'callout':
+                    fieldsHtml = `
+                        <div class="custom-item-fields">
+                            <div class="field-row">
+                                <div class="form-group">
+                                    <label class="form-label">Title (optional)</label>
+                                    <input type="text" class="form-input" id="blockCalloutTitle" placeholder="Important Notice">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Style</label>
+                                    <select class="form-input" id="blockCalloutStyle">
+                                        <option value="info">Info (Blue)</option>
+                                        <option value="success">Success (Green)</option>
+                                        <option value="warning">Warning (Orange)</option>
+                                        <option value="highlight">Highlight (Yellow)</option>
+                                        <option value="rais">RAIS² Branded</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Content *</label>
+                                <textarea class="form-textarea" id="blockCalloutContent" rows="3" placeholder="Enter your message..."></textarea>
+                            </div>
+                        </div>`;
+                    break;
+            }
+
+            container.innerHTML = fieldsHtml;
+        }
+
+        function saveGraphicalBlock() {
+            if (!selectedBlockType || !window.BlockManager) {
+                App.showToast('Please select a block type', 'error');
+                return;
+            }
+
+            let blockData = {};
+
+            switch (selectedBlockType) {
+                case 'image':
+                    const imageUrl = document.getElementById('blockImageUrl')?.value.trim();
+                    if (!imageUrl) {
+                        App.showToast('Image URL is required', 'error');
+                        return;
+                    }
+                    blockData = {
+                        imageUrl,
+                        altText: document.getElementById('blockImageAlt')?.value.trim() || '',
+                        caption: document.getElementById('blockImageCaption')?.value.trim() || '',
+                        linkUrl: document.getElementById('blockImageLink')?.value.trim() || ''
+                    };
+                    break;
+
+                case 'cta-button':
+                    const buttonText = document.getElementById('blockButtonText')?.value.trim();
+                    const buttonLink = document.getElementById('blockButtonLink')?.value.trim();
+                    if (!buttonText || !buttonLink) {
+                        App.showToast('Button text and link are required', 'error');
+                        return;
+                    }
+                    blockData = {
+                        buttonText,
+                        linkUrl: buttonLink,
+                        variant: document.getElementById('blockButtonVariant')?.value || 'primary'
+                    };
+                    break;
+
+                case 'quote':
+                    const quoteText = document.getElementById('blockQuoteText')?.value.trim();
+                    if (!quoteText) {
+                        App.showToast('Quote text is required', 'error');
+                        return;
+                    }
+                    blockData = {
+                        quoteText,
+                        author: document.getElementById('blockQuoteAuthor')?.value.trim() || '',
+                        authorRole: document.getElementById('blockQuoteRole')?.value.trim() || ''
+                    };
+                    break;
+
+                case 'feature-box':
+                    const heading = document.getElementById('blockFeatureHeading')?.value.trim();
+                    if (!heading) {
+                        App.showToast('Heading is required', 'error');
+                        return;
+                    }
+                    blockData = {
+                        heading,
+                        icon: document.getElementById('blockFeatureIcon')?.value || 'star',
+                        description: document.getElementById('blockFeatureDesc')?.value.trim() || '',
+                        linkUrl: document.getElementById('blockFeatureLink')?.value.trim() || '',
+                        linkText: document.getElementById('blockFeatureLinkText')?.value.trim() || 'Learn more'
+                    };
+                    break;
+
+                case 'divider':
+                    blockData = {
+                        dividerStyle: document.getElementById('blockDividerStyle')?.value || 'gradient'
+                    };
+                    break;
+
+                case 'callout':
+                    const calloutContent = document.getElementById('blockCalloutContent')?.value.trim();
+                    if (!calloutContent) {
+                        App.showToast('Callout content is required', 'error');
+                        return;
+                    }
+                    blockData = {
+                        calloutTitle: document.getElementById('blockCalloutTitle')?.value.trim() || '',
+                        calloutStyle: document.getElementById('blockCalloutStyle')?.value || 'info',
+                        calloutContent
+                    };
+                    break;
+            }
+
+            // Create the block
+            window.BlockManager.createBlock(selectedBlockType, {
+                data: blockData
+            });
+
+            closeGraphicalBlockModal();
+            renderSections();
+            updatePreview();
+            App.showToast('Block added!', 'success');
+        }
+
+        // ============ SETUP EVENT LISTENERS FOR NEW FEATURES ============
+
+        function setupNewFeatureListeners() {
+            // Add Custom Item button
+            const addCustomBtn = document.getElementById('btnAddCustomItem');
+            if (addCustomBtn) {
+                addCustomBtn.addEventListener('click', openCustomItemModal);
+            }
+
+            // Save Custom Item button
+            const saveCustomBtn = document.getElementById('btnSaveCustomItem');
+            if (saveCustomBtn) {
+                saveCustomBtn.addEventListener('click', saveCustomItem);
+            }
+
+            // Save Graphical Block button
+            const saveGraphicalBtn = document.getElementById('btnSaveGraphicalBlock');
+            if (saveGraphicalBtn) {
+                saveGraphicalBtn.addEventListener('click', saveGraphicalBlock);
+            }
+
+            // Featured item selector
+            const featuredSelect = document.getElementById('settingFeaturedItem');
+            if (featuredSelect) {
+                featuredSelect.addEventListener('change', () => {
+                    saveNewsletterSettings();
+                    updatePreview();
+                });
+            }
+
+            // Initialize CustomItemManager
+            if (window.CustomItemManager) {
+                window.CustomItemManager.init({
+                    onChange: () => {
+                        renderSections();
+                        updatePreview();
+                    }
+                });
+
+                // Load existing custom items into allItems
+                const customItems = window.CustomItemManager.getAllItems();
+                customItems.forEach(item => {
+                    if (!allItems.find(i => i.id === item.id)) {
+                        allItems.push(item);
+                    }
+                });
+            }
+
+            // Load existing CSV items into allItems
+            loadCSVItemsIntoBuilder();
+
+            // Import CSV button
+            const importCsvBtn = document.getElementById('btnImportCSV');
+            if (importCsvBtn) {
+                importCsvBtn.addEventListener('click', openCsvImportModal);
+            }
+
+            // CSV file input handler
+            const builderCsvInput = document.getElementById('builderCsvFileInput');
+            if (builderCsvInput) {
+                builderCsvInput.addEventListener('change', handleBuilderCsvFile);
+            }
+
+            // Confirm CSV import button
+            const confirmCsvBtn = document.getElementById('btnConfirmCsvImport');
+            if (confirmCsvBtn) {
+                confirmCsvBtn.addEventListener('click', confirmCsvImport);
+            }
+
+            // Listen for storage changes (cross-tab sync for CSV items)
+            window.addEventListener('storage', (e) => {
+                if (e.key === StorageManager.KEYS.CSV_ITEMS) {
+                    loadCSVItemsIntoBuilder();
+                    renderSections();
+                    updatePreview();
+                }
+            });
+            window.addEventListener('storageChange', (e) => {
+                if (e.detail && e.detail.key === StorageManager.KEYS.CSV_ITEMS) {
+                    loadCSVItemsIntoBuilder();
+                    renderSections();
+                    updatePreview();
+                }
+            });
+        }
+
+        // ===== CSV Import Functions =====
+
+        let pendingCsvItems = []; // Temp storage for preview before import
+
+        function loadCSVItemsIntoBuilder() {
+            const csvData = StorageManager.getCSVItems();
+            if (csvData && csvData.items) {
+                // Remove old CSV items first
+                allItems = allItems.filter(item => !item.isCSV);
+                // Add fresh ones
+                csvData.items.forEach(item => {
+                    allItems.push(item);
+                });
+            }
+        }
+
+        function openCsvImportModal() {
+            pendingCsvItems = [];
+            document.getElementById('csvImportModal').classList.add('active');
+            document.getElementById('csvImportPreview').style.display = 'none';
+            document.getElementById('btnConfirmCsvImport').disabled = true;
+            document.getElementById('builderFileLabelText').textContent = 'Click to select CSV file or drag and drop';
+            const fileInput = document.getElementById('builderCsvFileInput');
+            if (fileInput) fileInput.value = '';
+        }
+
+        function closeCsvImportModal() {
+            document.getElementById('csvImportModal').classList.remove('active');
+            pendingCsvItems = [];
+        }
+
+        function handleBuilderCsvFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('builderFileLabelText').textContent = file.name;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const rawItems = CSVUtils.parseCSV(ev.target.result);
+                if (rawItems.length === 0) {
+                    App.showToast('No items found in CSV file', 'error');
+                    return;
+                }
+
+                pendingCsvItems = CSVUtils.transformItems(rawItems);
+
+                // Show preview
+                const previewDiv = document.getElementById('csvImportPreview');
+                const listDiv = document.getElementById('csvImportItemsList');
+                previewDiv.style.display = 'block';
+                document.getElementById('btnConfirmCsvImport').disabled = false;
+
+                listDiv.innerHTML = pendingCsvItems.map((item, i) => `
+                    <div style="padding: 8px 12px; background: var(--ubt-light-gray); border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 13px;">
+                        <span style="display: inline-block; padding: 1px 6px; background: ${item.category === 'lecture' ? '#fff3e0' : item.category === 'event' ? '#e3f2fd' : '#e8f5e9'}; color: ${item.category === 'lecture' ? '#e65100' : item.category === 'event' ? '#1565c0' : '#2e7d32'}; border-radius: 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-right: 8px;">${item.category}</span>
+                        <strong>${App.escapeHtml(item.title)}</strong>
+                        ${item.date ? `<span style="color: var(--ubt-medium-gray); margin-left: 8px;">${App.escapeHtml(item.date)}</span>` : ''}
+                    </div>
+                `).join('');
+            };
+            reader.readAsText(file);
+        }
+
+        function confirmCsvImport() {
+            if (pendingCsvItems.length === 0) return;
+
+            const saved = StorageManager.addCSVItems(pendingCsvItems);
+            loadCSVItemsIntoBuilder();
+            renderSections();
+            updatePreview();
+            closeCsvImportModal();
+            App.showToast(`${saved.length} CSV items imported!`, 'success');
+        }
+
+    </script>
+</body>
+</html>

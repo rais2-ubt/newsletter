@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - CMS Export</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/cms-export.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">CMS Export</h1>
+                <p class="page-subtitle">Generate content for University of Bayreuth CMS</p>
+            </div>
+
+            <!-- Source Tabs -->
+            <div class="cms-source-tabs">
+                <button class="cms-source-tab active" data-source="newsletter">Newsletter Items</button>
+                <button class="cms-source-tab" data-source="forms">Google Forms</button>
+                <button class="cms-source-tab" data-source="manual">Manual Entry</button>
+                <button class="cms-source-tab" data-source="csv">CSV Items</button>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="cms-layout">
+                <!-- Left Column - Source Selection -->
+                <div class="cms-source-panel">
+                    <!-- Newsletter Items Source -->
+                    <div class="cms-source-content" id="cmsNewsletterSource">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Select Item</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Content to export</label>
+                                    <select class="form-input" id="cmsItemSelect">
+                                        <option value="">Choose an item...</option>
+                                    </select>
+                                </div>
+                                <p class="text-muted" style="font-size: 13px; margin-top: 12px;">
+                                    Select a news item, event, or lecture from the scraped content to generate CMS fields.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Google Forms Source (hidden by default) -->
+                    <div class="cms-source-content" id="cmsFormsSource" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Import Data</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="cms-import-method">
+                                    <button class="cms-import-method-btn active" data-method="csv">CSV Upload</button>
+                                    <button class="cms-import-method-btn" data-method="json">JSON Paste</button>
+                                    <button class="cms-import-method-btn" data-method="sheets">Sheets API</button>
+                                </div>
+
+                                <!-- CSV Upload -->
+                                <div id="cmsImportCSV">
+                                    <div class="cms-import-area" id="csvDropArea">
+                                        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                                        <p>Drop CSV file here or click to upload</p>
+                                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                                    </div>
+                                </div>
+
+                                <!-- JSON Paste -->
+                                <div id="cmsImportJSON" style="display: none;">
+                                    <textarea class="form-input cms-json-textarea" id="jsonInput" placeholder="Paste JSON data here..." rows="6"></textarea>
+                                    <button class="btn btn-primary" id="btnParseJson" style="margin-top: 12px;">Parse JSON</button>
+                                </div>
+
+                                <!-- Sheets API -->
+                                <div id="cmsImportSheets" style="display: none;">
+                                    <!-- Auth Method Toggle -->
+                                    <div class="cms-auth-toggle" style="margin-bottom: 16px;">
+                                        <button class="cms-auth-btn active" data-auth="oauth" id="btnAuthOAuth">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-right: 6px;"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/></svg>
+                                            Sign in with Google
+                                        </button>
+                                        <button class="cms-auth-btn" data-auth="apikey" id="btnAuthApiKey">
+                                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-right: 6px;"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                                            Use API Key
+                                        </button>
+                                    </div>
+
+                                    <!-- OAuth Method -->
+                                    <div id="sheetsOAuthMethod">
+                                        <div class="form-group">
+                                            <label>Google Sheet ID or URL</label>
+                                            <input type="text" class="form-input" id="sheetsIdOAuth" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+                                            <small class="text-muted" style="display: block; margin-top: 4px;">Paste the Sheet ID or full URL</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Sheet Name (optional)</label>
+                                            <input type="text" class="form-input" id="sheetsRangeOAuth" placeholder="Sheet1">
+                                        </div>
+                                        <div id="googleUserInfo" style="display: none; margin-bottom: 12px; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 6px;">
+                                            <span id="googleUserEmail" style="font-size: 13px;"></span>
+                                            <button class="btn btn-sm" id="btnGoogleSignOut" style="margin-left: 8px; padding: 2px 8px; font-size: 12px;">Sign Out</button>
+                                        </div>
+                                        <button class="btn btn-primary" id="btnFetchSheetsOAuth">
+                                            <span id="oauthBtnText">Sign In & Fetch Data</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- API Key Method -->
+                                    <div id="sheetsApiKeyMethod" style="display: none;">
+                                        <div class="form-group">
+                                            <label>Google Sheet ID</label>
+                                            <input type="text" class="form-input" id="sheetsId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Sheet Name (optional)</label>
+                                            <input type="text" class="form-input" id="sheetsRange" placeholder="Sheet1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>API Key</label>
+                                            <input type="text" class="form-input" id="sheetsApiKey" placeholder="Your Google Sheets API key">
+                                            <small class="text-muted" style="display: block; margin-top: 4px;">
+                                                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--primary);">Get API Key</a> - Enable Sheets API first
+                                            </small>
+                                        </div>
+                                        <button class="btn btn-primary" id="btnFetchSheets">Fetch Data</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Entry Source (hidden by default) -->
+                    <div class="cms-source-content" id="cmsManualSource" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Manual Entry</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Content Type</label>
+                                    <select class="form-input" id="manualContentType">
+                                        <option value="event">Event</option>
+                                        <option value="lecture">Lecture</option>
+                                        <option value="news">News</option>
+                                        <option value="publication">Publication</option>
+                                        <option value="member">Member</option>
+                                        <option value="project">Project</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Title *</label>
+                                    <input type="text" class="form-input" id="manualTitle" placeholder="Enter title...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea class="form-input" id="manualDescription" placeholder="Enter description..." rows="4"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input type="text" class="form-input" id="manualDate" placeholder="DD.MM.YYYY">
+                                </div>
+                                <div class="form-group">
+                                    <label>URL</label>
+                                    <input type="text" class="form-input" id="manualUrl" placeholder="https://...">
+                                </div>
+                                <button class="btn btn-primary" id="btnGenerateManual">Generate CMS Fields</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSV Items Source (hidden by default) -->
+                    <div class="cms-source-content" id="cmsCsvSource" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">CSV Items</h3>
+                                <span class="text-muted" id="cmsCsvItemCount">0 items</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Select CSV Item</label>
+                                    <select class="form-input" id="cmsCsvItemSelect">
+                                        <option value="">Choose an item...</option>
+                                    </select>
+                                </div>
+                                <p class="text-muted" style="font-size: 13px; margin-top: 12px;">
+                                    Select a CSV item to generate CMS fields. Items are saved from the CSV Processor page.
+                                </p>
+                                <div style="margin-top: 12px;">
+                                    <a href="csv-processor.html" class="btn btn-sm btn-secondary">Open CSV Processor</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - CMS Fields -->
+                <div class="cms-fields-panel">
+                    <div class="card">
+                        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+                            <h3 class="card-title">CMS Fields</h3>
+                            <div class="cms-view-toggle" id="cmsViewToggle" style="display: none;">
+                                <button class="cms-view-btn active" data-view="cms">CMS View</button>
+                                <button class="cms-view-btn" data-view="raw">Raw Data</button>
+                            </div>
+                            <span class="text-muted" style="font-size: 12px;">Akkordeonelement Template</span>
+                        </div>
+                        <div class="card-body" id="cmsFieldsContainer">
+                            <div class="cms-empty-state">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+                                <p>Select an item to generate CMS fields</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="card" id="cmsPreviewSection" style="display: none; margin-top: 16px;">
+                        <div class="card-header">
+                            <h3 class="card-title">Preview</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="cms-preview-frame" id="cmsPreviewFrame"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/cms-generator.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cms-export-page.js"></script>
+</body>
+</html>

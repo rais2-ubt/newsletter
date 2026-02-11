@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Overview of your newsletter system</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid stagger-children" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.11 3.89 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.89 20.11 3 19 3ZM19 19H5V5H19V19Z"/><path d="M7 7H17V9H7V7ZM7 11H17V13H7V11ZM7 15H13V17H7V15Z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statNewItems">-</div>
+                        <div class="stat-label">New Items</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statSubscribers">-</div>
+                        <div class="stat-label">Subscribers</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statNewsletters">-</div>
+                        <div class="stat-label">Newsletters</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statLastScrape">-</div>
+                        <div class="stat-label">Last Scrape</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="statCsvItems">-</div>
+                        <div class="stat-label">CSV Items</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scraping Dashboard -->
+            <div id="scrapeDashboardContainer" class="mb-lg"></div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-lg">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                <div class="card-body">
+                    <div class="flex gap-md" style="flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="btnScrape">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                            Scrape Now
+                        </button>
+                        <button class="btn btn-secondary" id="btnClearCache">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            Clear Cache
+                        </button>
+                        <a href="builder.html" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z"/></svg>
+                            Create Newsletter
+                        </a>
+                        <a href="viewer.html" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>
+                            View Archive
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Content -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Content</h2>
+                </div>
+                <div class="card-body" id="contentList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/idb-storage.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/newsletter.js"></script>
+    <script src="js/email.js"></script>
+    <script src="js/subscribers.js"></script>
+    <script src="js/motion.js"></script>
+    <script src="js/scrape-dashboard.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.warn('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+    <script>
+        // Debug logging (console only)
+        function _dbg(loc,msg,data,hyp){ /* disabled in production */ }
+    </script>
+    <script>
+        // Dashboard specific code
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize scraping dashboard
+            if (window.ScrapeDashboard) {
+                ScrapeDashboard.init('scrapeDashboardContainer');
+                ScrapeDashboard.loadInitialStatus();
+            }
+
+            // Trigger stagger animation on stats grid
+            if (window.Motion) {
+                setTimeout(() => {
+                    const statsGrid = document.getElementById('statsGrid');
+                    if (statsGrid) {
+                        Motion.triggerReveal(statsGrid);
+                    }
+                }, 100);
+            }
+
+            updateStats();
+            loadContent();
+
+            // Clear Cache button
+            document.getElementById('btnClearCache').addEventListener('click', () => {
+                localStorage.removeItem('rais2_cached_content');
+                App.showToast('Cache cleared! Click "Scrape Now" to fetch fresh content.', 'success');
+                updateStats();
+            });
+
+            // Scrape button - forces fresh scrape with progress UI
+            document.getElementById('btnScrape').addEventListener('click', async () => {
+                // #region agent log
+                _dbg('index.html:scrapeButton:clicked','Scrape Now button clicked',{},'H5');
+                // #endregion
+
+                // Expand the scrape dashboard to show progress
+                if (window.ScrapeDashboard) {
+                    ScrapeDashboard.expand();
+                }
+
+                const btn = document.getElementById('btnScrape');
+                const container = document.getElementById('contentList');
+                btn.disabled = true;
+                btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;"></div> Scraping...';
+
+                // Show progress UI in content area
+                if (window.Motion) {
+                    Motion.showProgressLoader(container, { message: 'Starting fresh scrape...', percent: 0 });
+                }
+
+                try {
+                    const content = await RAIS2Scraper.scrapeAll(false, (progress) => {
+                        if (window.Motion) {
+                            Motion.updateProgress(container, {
+                                message: progress.message,
+                                percent: progress.percent
+                            });
+                        }
+                    });
+                    // #region agent log
+                    _dbg('index.html:scrapeButton:success','Scrape completed',{newsCount:content.news?.length,eventsCount:content.events?.length,lecturesCount:content.lectures?.length},'H5');
+                    // #endregion
+                    App.showToast('Content scraped successfully!', 'success');
+                    updateStats();
+                    // Render content directly instead of calling loadContent (which would use cache)
+                    renderContent(content);
+                } catch (e) {
+                    // #region agent log
+                    _dbg('index.html:scrapeButton:error','Scrape failed',{error:e.message},'H5');
+                    // #endregion
+                    App.showToast('Scraping failed: ' + e.message, 'error');
+                    container.innerHTML = `<div class="alert alert-error">Scraping failed: ${e.message}</div>`;
+                }
+
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg> Scrape Now`;
+            });
+
+        });
+
+        function updateStats() {
+            // Subscribers
+            const subCounts = SubscriberManager.getCounts();
+            document.getElementById('statSubscribers').textContent = subCounts.active;
+
+            // Newsletters
+            const newsletters = StorageManager.getNewsletters();
+            document.getElementById('statNewsletters').textContent = newsletters.newsletters.length;
+
+            // Last scrape
+            const cached = StorageManager.getCachedContent();
+            if (cached.cachedAt) {
+                document.getElementById('statLastScrape').textContent = App.formatRelativeTime(cached.cachedAt);
+            } else {
+                document.getElementById('statLastScrape').textContent = 'Never';
+            }
+
+            // New items
+            const content = cached;
+            const allItems = RAIS2Scraper.getAllItems(content);
+            const newItems = RAIS2Scraper.getNewItems(allItems);
+            document.getElementById('statNewItems').textContent = newItems.length;
+
+            // CSV items
+            const csvData = StorageManager.getCSVItems();
+            document.getElementById('statCsvItems').textContent = csvData.items ? csvData.items.length : 0;
+        }
+
+        async function loadContent() {
+            // #region agent log
+            _dbg('index.html:loadContent:entry','loadContent called',{},'H5');
+            // #endregion
+            const container = document.getElementById('contentList');
+
+            // Use progress loader if Motion available
+            if (window.Motion) {
+                Motion.showProgressLoader(container, { message: 'Starting...', percent: 0 });
+            } else {
+                container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            }
+
+            try {
+                const content = await RAIS2Scraper.scrapeAll(true, (progress) => {
+                    if (window.Motion) {
+                        Motion.updateProgress(container, {
+                            message: progress.message,
+                            percent: progress.percent
+                        });
+                    }
+                });
+                const allItems = RAIS2Scraper.getAllItems(content);
+                // #region agent log
+                _dbg('index.html:loadContent:result','Content loaded',{allItemsCount:allItems.length,newsCount:content.news?.length,eventsCount:content.events?.length,lecturesCount:content.lectures?.length},'H5');
+                // #endregion
+
+                if (allItems.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="opacity:0.3;"><path d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.11 3.89 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.89 20.11 3 19 3ZM19 19H5V5H19V19Z"/></svg>
+                            <h3>No content yet</h3>
+                            <p>Click "Scrape Now" to fetch content from the RAIS² website</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Show recent items with mail card styling
+                const recentItems = allItems.slice(0, 10);
+                container.innerHTML = `<div class="stagger-children" id="itemsContainer">
+                    ${recentItems.map(item => {
+                        const isNew = !StorageManager.isItemSeen(item.id);
+                        return `
+                            <div class="mail-card ${item.category}">
+                                <div class="item-meta">
+                                    <span class="item-date">${NewsletterGenerator.formatDate(item.date)}</span>
+                                    <span class="item-badge ${item.category}">${item.category}</span>
+                                    ${isNew ? '<span class="item-badge badge-pulse" style="background:#e8f5e9;color:#2e7d32;">New</span>' : ''}
+                                </div>
+                                <h3 class="item-title">
+                                    <a href="${item.url}" target="_blank">${App.escapeHtml(item.title)}</a>
+                                </h3>
+                                ${item.summary ? `<p class="item-summary">${App.escapeHtml(item.summary)}</p>` : ''}
+                                <a href="${item.url}" target="_blank" class="item-link">Read more →</a>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>`;
+
+                // Trigger stagger animation
+                if (window.Motion) {
+                    setTimeout(() => {
+                        const itemsContainer = document.getElementById('itemsContainer');
+                        if (itemsContainer) {
+                            Motion.triggerReveal(itemsContainer);
+                        }
+                    }, 100);
+                }
+
+                updateStats();
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="alert alert-error">
+                        Failed to load content: ${e.message}
+                    </div>
+                `;
+            }
+        }
+
+        function renderContent(content) {
+            const container = document.getElementById('contentList');
+            const allItems = RAIS2Scraper.getAllItems(content);
+
+            if (allItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="opacity:0.3;"><path d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.11 3.89 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.89 20.11 3 19 3ZM19 19H5V5H19V19Z"/></svg>
+                        <h3>No content found</h3>
+                        <p>Try scraping again later</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const recentItems = allItems.slice(0, 10);
+            container.innerHTML = `<div class="stagger-children" id="itemsContainer">
+                ${recentItems.map(item => {
+                    const isNew = !StorageManager.isItemSeen(item.id);
+                    return `
+                        <div class="mail-card ${item.category}">
+                            <div class="item-meta">
+                                <span class="item-date">${NewsletterGenerator.formatDate(item.date)}</span>
+                                <span class="item-badge ${item.category}">${item.category}</span>
+                                ${isNew ? '<span class="item-badge badge-pulse" style="background:#e8f5e9;color:#2e7d32;">New</span>' : ''}
+                            </div>
+                            <h3 class="item-title">
+                                <a href="${item.url}" target="_blank">${App.escapeHtml(item.title)}</a>
+                            </h3>
+                            ${item.summary ? `<p class="item-summary">${App.escapeHtml(item.summary)}</p>` : ''}
+                            <a href="${item.url}" target="_blank" class="item-link">Read more →</a>
+                        </div>
+                    `;
+                }).join('')}
+            </div>`;
+
+            if (window.Motion) {
+                setTimeout(() => {
+                    const itemsContainer = document.getElementById('itemsContainer');
+                    if (itemsContainer) {
+                        Motion.triggerReveal(itemsContainer);
+                    }
+                }, 100);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - CSV Processor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .processor-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .upload-section {
+            background: var(--ubt-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-xl);
+            border: 2px dashed var(--ubt-medium-gray);
+            border-radius: var(--radius-md);
+            background: var(--ubt-light-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .file-input-label:hover {
+            border-color: var(--ubt-green);
+            background: var(--ubt-green-light);
+        }
+        .file-input-label.has-file {
+            border-color: var(--ubt-green);
+            background: var(--ubt-green-light);
+        }
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        @media (max-width: 1200px) {
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        .output-card {
+            background: var(--ubt-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+        .output-card h3 {
+            margin-bottom: var(--spacing-lg);
+            color: var(--ubt-dark-gray);
+            font-family: var(--font-headline);
+            font-size: 24px;
+        }
+        .output-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--ubt-light-gray);
+        }
+        .output-tab {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--ubt-medium-gray);
+            transition: var(--transition);
+            margin-bottom: -2px;
+        }
+        .output-tab:hover {
+            color: var(--ubt-dark-gray);
+        }
+        .output-tab.active {
+            color: var(--ubt-green);
+            border-bottom-color: var(--ubt-green);
+            font-weight: 600;
+        }
+        .output-content {
+            display: none;
+        }
+        .output-content.active {
+            display: block;
+        }
+        .output-textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: var(--spacing-md);
+            border: 1px solid var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            background: #fafafa;
+        }
+        .output-textarea:focus {
+            outline: none;
+            border-color: var(--ubt-green);
+            background: var(--ubt-white);
+        }
+        .copy-btn {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--ubt-green);
+            color: var(--ubt-white);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .copy-btn:hover {
+            background: var(--ubt-green-dark);
+        }
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        .item-card {
+            background: var(--ubt-white);
+            border: 1px solid var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .item-card:hover {
+            border-color: var(--ubt-green);
+            box-shadow: var(--shadow-md);
+        }
+        .item-card.selected {
+            border-color: var(--ubt-green);
+            background: var(--ubt-green-light);
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--spacing-sm);
+        }
+        .item-type {
+            padding: 4px 8px;
+            background: var(--ubt-green-light);
+            color: var(--ubt-green-dark);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .item-title {
+            font-weight: 600;
+            color: var(--ubt-dark-gray);
+            margin-bottom: var(--spacing-xs);
+        }
+        .item-meta {
+            font-size: 12px;
+            color: var(--ubt-medium-gray);
+            margin-top: var(--spacing-xs);
+        }
+        .language-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        .language-tab {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: var(--ubt-light-gray);
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        .language-tab.active {
+            background: var(--ubt-green);
+            color: var(--ubt-white);
+        }
+        .save-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .saved-count {
+            font-size: 13px;
+            color: var(--ubt-medium-gray);
+            margin-left: auto;
+        }
+        .field-inspector {
+            background: var(--ubt-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+        }
+        .field-inspector h3 {
+            color: var(--ubt-dark-gray);
+            font-family: var(--font-headline);
+            font-size: 22px;
+        }
+        .inspector-fields {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+        .inspector-field label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+            color: var(--ubt-dark-gray);
+            font-size: 14px;
+        }
+        .field-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+        .field-tag.required {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .field-tag.optional {
+            background: var(--ubt-light-gray);
+            color: var(--ubt-medium-gray);
+        }
+        .inspector-field input,
+        .inspector-field textarea,
+        .inspector-field select {
+            width: 100%;
+            padding: var(--spacing-sm);
+            border: 1px solid var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+        }
+        .inspector-field input:focus,
+        .inspector-field textarea:focus {
+            outline: none;
+            border-color: var(--ubt-green);
+        }
+        .inspector-field.missing-required input,
+        .inspector-field.missing-required textarea {
+            border-color: #ff9800;
+            background: #fff8e1;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">CSV Processor</h1>
+                <p class="page-subtitle">Process CSV submissions and generate newsletter content</p>
+            </div>
+
+            <div class="processor-container">
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h2 style="margin-bottom: var(--spacing-lg); color: var(--ubt-dark-gray);">Upload CSV File or Enter Data Manually</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                        <div>
+                            <h3 style="font-size: 16px; margin-bottom: var(--spacing-md); color: var(--ubt-dark-gray);">CSV File</h3>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="csvFileInput" accept=".csv" />
+                                <label for="csvFileInput" class="file-input-label" id="fileInputLabel">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/>
+                                    </svg>
+                                    <span id="fileLabelText">Click to select CSV file or drag and drop</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 16px; margin-bottom: var(--spacing-md); color: var(--ubt-dark-gray);">Manual Entry</h3>
+                            <button class="btn btn-secondary" onclick="showManualEntry()" style="width: 100%; margin-bottom: var(--spacing-sm);">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2zm-3-7V3.5L18.5 9H13z"/></svg>
+                                Add Lecture/Event Manually
+                            </button>
+                            <button class="btn btn-secondary" onclick="showTextParser()" style="width: 100%;">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9H19V1h-2v1H7V1H5v1H3.5C2.67 2 2 2.67 2 3.5v17C2 21.33 2.67 22 3.5 22h17c.83 0 1.5-.67 1.5-1.5v-17C22 2.67 21.33 2 20.5 2zM20 20H4V9h16v11z"/></svg>
+                                Parse from Text
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Parser Form -->
+                    <div id="textParserForm" style="display: none; padding: var(--spacing-lg); background: var(--ubt-light-gray); border-radius: var(--radius-md); margin-top: var(--spacing-lg);">
+                        <h3 style="margin-bottom: var(--spacing-md); color: var(--ubt-dark-gray);">Paste Lecture/Event Text</h3>
+                        <div style="display: grid; gap: var(--spacing-md);">
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Text</label>
+                                <textarea id="parserText" placeholder='Paste text like: "Lecture \"Einführung in Algorithmische Fairness\"\nDr. Timo Speith from the Chair of Philosophy, Computer Science, and AI at the University of Bayreuth will give a lecture titled \"Introduction to Algorithmic Fairness\" for the association b{u}ilt on November 27, 2025, from 18:00 to 19:00 in room S 66 (RW1)."' rows="6" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md); resize: vertical; font-family: monospace;"></textarea>
+                            </div>
+                            <div style="display: flex; gap: var(--spacing-md);">
+                                <button class="btn btn-primary" onclick="parseText()">Parse & Add</button>
+                                <button class="btn btn-secondary" onclick="hideTextParser()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Entry Form -->
+                    <div id="manualEntryForm" style="display: none; padding: var(--spacing-lg); background: var(--ubt-light-gray); border-radius: var(--radius-md); margin-top: var(--spacing-lg);">
+                        <h3 style="margin-bottom: var(--spacing-md); color: var(--ubt-dark-gray);">Enter Lecture/Event Information</h3>
+                        <div style="display: grid; gap: var(--spacing-md);">
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Type</label>
+                                <select id="manualType" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md);">
+                                    <option value="Lecture">Lecture / Talk</option>
+                                    <option value="Event">Event</option>
+                                    <option value="Workshop">Workshop</option>
+                                    <option value="Conference">Conference</option>
+                                    <option value="Call for Papers">Call for Papers</option>
+                                    <option value="General News">General News</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Title</label>
+                                <input type="text" id="manualTitle" placeholder="e.g., Einführung in Algorithmische Fairness" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md);" />
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Speaker</label>
+                                <input type="text" id="manualSpeaker" placeholder="e.g., Dr. Timo Speith from the Chair of Philosophy, Computer Science, and AI" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md);" />
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Date & Time</label>
+                                <input type="text" id="manualDate" placeholder="e.g., November 27, 2025, from 18:00 to 19:00" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md);" />
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Location</label>
+                                <input type="text" id="manualLocation" placeholder="e.g., room S 66 (RW1)" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md);" />
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: var(--spacing-xs); font-weight: 600; color: var(--ubt-dark-gray);">Description</label>
+                                <textarea id="manualDescription" placeholder="Brief description of the lecture/event" rows="3" style="width: 100%; padding: var(--spacing-sm); border: 1px solid var(--ubt-light-gray); border-radius: var(--radius-md); resize: vertical;"></textarea>
+                            </div>
+                            <div style="display: flex; gap: var(--spacing-md);">
+                                <button class="btn btn-primary" onclick="addManualEntry()">Add to List</button>
+                                <button class="btn btn-secondary" onclick="hideManualEntry()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items List -->
+                <div id="itemsSection" class="card" style="display: none;">
+                    <div class="card-header">
+                        <h2 class="card-title">Processed Items</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-list" id="itemsList"></div>
+                    </div>
+                </div>
+
+                <!-- Save to Newsletter Actions -->
+                <div id="csvSaveActions" class="card" style="display: none; margin-bottom: var(--spacing-xl);">
+                    <div class="card-header">
+                        <h2 class="card-title">Save to Newsletter</h2>
+                        <span class="saved-count" id="csvSavedCount">0 items saved</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="color: var(--ubt-medium-gray); font-size: 13px; margin-bottom: var(--spacing-md);">
+                            Save processed items to make them available in the Newsletter Builder, CMS Export, and Dashboard.
+                        </p>
+                        <div class="save-actions">
+                            <button class="btn btn-primary" id="btnSaveAllCSV">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                Save All Items
+                            </button>
+                            <button class="btn btn-secondary" id="btnSaveSelectedCSV" disabled>
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                Save Selected
+                            </button>
+                            <button class="btn btn-secondary" id="btnClearSavedCSV">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                Clear Saved
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Inspector -->
+                <div id="fieldInspector" class="field-inspector" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                        <h3 style="margin: 0;">Field Inspector</h3>
+                        <span class="text-muted" id="inspectorItemTitle" style="font-size: 13px;"></span>
+                    </div>
+                    <div class="inspector-fields">
+                        <div class="inspector-field">
+                            <label>Type</label>
+                            <select id="inspectorType" onchange="onInspectorTypeChange()">
+                                <option value="lecture">Lecture / Talk</option>
+                                <option value="event">Event</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="conference">Conference</option>
+                                <option value="cfp">Call for Papers / Positions</option>
+                                <option value="news">General News</option>
+                            </select>
+                        </div>
+                        <div id="inspectorDynamicFields"></div>
+                    </div>
+                    <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg);">
+                        <button class="btn btn-primary" onclick="generateFromInspector()">Generate Text</button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="results-section" style="display: none;">
+                    <!-- Selected Item Output -->
+                    <div class="output-card">
+                        <h3>Generated Content</h3>
+                        <div class="language-tabs">
+                            <button class="language-tab active" data-lang="de">German</button>
+                            <button class="language-tab" data-lang="en">English</button>
+                        </div>
+                        <div class="output-tabs">
+                            <button class="output-tab" data-output="prompt">LLM Prompt</button>
+                            <button class="output-tab" data-output="html">HTML</button>
+                            <button class="output-tab active" data-output="text">Plain Text</button>
+                        </div>
+                        <div id="outputContent" class="output-content active">
+                            <textarea id="outputTextarea" class="output-textarea" readonly></textarea>
+                            <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                        </div>
+
+                        <!-- AI Enhancement Actions -->
+                        <div id="aiEnhancementSection" style="margin-top: var(--spacing-md); padding: var(--spacing-md); background: rgba(0, 146, 96, 0.05); border: 1px solid rgba(0, 146, 96, 0.2); border-radius: var(--radius-md);">
+                            <h4 style="margin: 0 0 var(--spacing-sm) 0; font-size: 14px; color: var(--ubt-green); display: flex; align-items: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zM11.5 9.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+                                AI Enhancement
+                            </h4>
+                            <p style="font-size: 12px; color: var(--ubt-medium-gray); margin: 0 0 var(--spacing-sm) 0;">Generate polished text with AI, or open the prompt in an external LLM chat.</p>
+                            <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+                                <button class="btn btn-primary btn-sm" id="btnGenerateWithAI" onclick="generateWithAI()" style="font-size: 13px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zM11.5 9.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+                                    Generate with AI
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="openInExternalChat('chatgpt')" style="font-size: 13px;" title="Copy prompt & open ChatGPT">
+                                    Open in ChatGPT
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="openInExternalChat('claude')" style="font-size: 13px;" title="Copy prompt & open Claude">
+                                    Open in Claude
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="openInExternalChat('gemini')" style="font-size: 13px;" title="Copy prompt & open Gemini">
+                                    Open in Gemini
+                                </button>
+                            </div>
+                            <div id="aiGenerationStatus" style="display: none; margin-top: var(--spacing-sm); font-size: 13px; padding: 8px 12px; border-radius: var(--radius-sm); background: rgba(0, 146, 96, 0.1); color: var(--ubt-green);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Card -->
+                    <div class="output-card">
+                        <h3>Preview</h3>
+                        <div id="previewContent" style="padding: var(--spacing-md); background: var(--ubt-light-gray); border-radius: var(--radius-md); min-height: 400px;">
+                            <p style="color: var(--ubt-medium-gray); text-align: center;">Select an item to see preview</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/csv-utils.js"></script>
+    <script src="js/ai-chat.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let csvData = [];
+        let selectedItem = null;
+        let selectedItemIndex = -1;
+        let inspectorFieldCache = {};
+        let currentLanguage = 'de';
+        let currentOutputType = 'text';
+
+        // File input handler
+        document.getElementById('csvFileInput').addEventListener('change', handleFileSelect);
+        
+        // Drag and drop
+        const fileInputLabel = document.getElementById('fileInputLabel');
+        fileInputLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileInputLabel.style.borderColor = 'var(--ubt-green)';
+        });
+        fileInputLabel.addEventListener('dragleave', () => {
+            fileInputLabel.style.borderColor = 'var(--ubt-medium-gray)';
+        });
+        fileInputLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInputLabel.style.borderColor = 'var(--ubt-medium-gray)';
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                processFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                csvData = parseCSV(text);
+                displayItems(csvData);
+                document.getElementById('fileLabelText').textContent = file.name;
+                document.getElementById('fileInputLabel').classList.add('has-file');
+                document.getElementById('itemsSection').style.display = 'block';
+            };
+            reader.readAsText(file);
+        }
+
+        // Delegate parsing to shared CSVUtils module
+        function parseCSV(text) {
+            return CSVUtils.parseCSV(text);
+        }
+
+        function parseCSVLine(line) {
+            return CSVUtils.parseCSVLine(line);
+        }
+
+        function displayItems(items) {
+            const container = document.getElementById('itemsList');
+            container.innerHTML = items.map((item, index) => {
+                const type = extractField(item, ['Type of Submission', 'Type']) || 'Unknown';
+                const title = extractField(item, [
+                    'Title of Event/Talk/News',
+                    'What is the title of the talk/lecture?',
+                    'What is the title?',
+                    'What is the title of the event?',
+                    'Title'
+                ]) || 'Untitled';
+                const date = extractField(item, [
+                    'When will the talk/lecture take place?',
+                    'When will the talk/lecture take place',
+                    'Date',
+                    'When',
+                    'Timestamp'
+                ]) || 'No date';
+                
+                return `
+                    <div class="item-card" data-index="${index}" onclick="selectItem(${index})">
+                        <div class="item-header">
+                            <div>
+                                <div class="item-type">${type}</div>
+                                <div class="item-title">${title}</div>
+                            </div>
+                        </div>
+                        <div class="item-meta">${date}</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Show save actions when items exist
+            document.getElementById('csvSaveActions').style.display = 'block';
+            updateSavedCount();
+        }
+
+        function selectItem(index) {
+            selectedItem = csvData[index];
+            selectedItemIndex = index;
+
+            // Update UI
+            document.querySelectorAll('.item-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+
+            document.getElementById('btnSaveSelectedCSV').disabled = false;
+            document.getElementById('resultsSection').style.display = 'none';
+            populateInspector(selectedItem);
+        }
+
+        // Language tabs
+        document.querySelectorAll('.language-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentLanguage = tab.dataset.lang;
+                updateOutput();
+            });
+        });
+
+        // Output type tabs
+        document.querySelectorAll('.output-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentOutputType = tab.dataset.output;
+                updateOutput();
+            });
+        });
+
+        function updateOutput() {
+            if (!selectedItem) return;
+
+            let content = '';
+            let preview = '';
+
+            if (currentOutputType === 'prompt') {
+                content = generatePrompt(selectedItem, currentLanguage);
+            } else if (currentOutputType === 'html') {
+                content = generateHTML(selectedItem, currentLanguage);
+                preview = content;
+            } else if (currentOutputType === 'text') {
+                content = generatePlainText(selectedItem, currentLanguage);
+                preview = `<pre style="white-space: pre-wrap; font-family: inherit;">${App.escapeHtml(content)}</pre>`;
+            }
+
+            document.getElementById('outputTextarea').value = content;
+            document.getElementById('previewContent').innerHTML = preview || `<p style="color: var(--ubt-medium-gray);">Preview not available for prompts</p>`;
+        }
+
+        // Delegate to shared CSVUtils module
+        function extractField(item, possibleKeys) {
+            return CSVUtils.extractField(item, possibleKeys);
+        }
+
+        function generatePrompt(item, lang) {
+            return CSVUtils.generatePrompt(item, lang);
+        }
+
+        function generateHTML(item, lang) {
+            return CSVUtils.generateHTML(item, lang);
+        }
+
+        function generatePlainText(item, lang) {
+            return CSVUtils.generatePlainText(item, lang);
+        }
+
+        // ===== AI Enhancement Functions =====
+
+        async function generateWithAI() {
+            if (!selectedItem) return;
+
+            const statusEl = document.getElementById('aiGenerationStatus');
+            const btn = document.getElementById('btnGenerateWithAI');
+
+            if (!StorageManager.isAIConfigured()) {
+                App.showToast('AI not configured. Go to Settings to set up an AI provider.', 'error');
+                return;
+            }
+
+            statusEl.style.display = 'block';
+            statusEl.textContent = 'Generating with AI...';
+            btn.disabled = true;
+
+            try {
+                const prompt = generatePrompt(selectedItem, currentLanguage);
+
+                if (!window.AIChat) {
+                    throw new Error('AI Chat module not loaded');
+                }
+
+                AIChat.loadSettings();
+                if (AIChat.settings.provider === 'puter') {
+                    await AIChat.loadPuter();
+                }
+
+                const response = await AIChat.callAI(prompt);
+                document.getElementById('outputTextarea').value = response;
+
+                statusEl.textContent = 'AI generation complete!';
+                setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+                App.showToast('AI text generated successfully!', 'success');
+            } catch (error) {
+                console.error('AI generation error:', error);
+                statusEl.textContent = 'Error: ' + error.message;
+                App.showToast('AI generation failed: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function openInExternalChat(provider) {
+            if (!selectedItem) return;
+
+            const prompt = generatePrompt(selectedItem, currentLanguage);
+
+            // Always copy to clipboard as fallback
+            navigator.clipboard.writeText(prompt).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = prompt;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            });
+
+            const encodedPrompt = encodeURIComponent(prompt);
+
+            switch (provider) {
+                case 'chatgpt':
+                    // ChatGPT natively supports ?q= to pre-fill the prompt
+                    window.open(`https://chatgpt.com/?q=${encodedPrompt}&temporary-chat=true`, '_blank');
+                    App.showToast('Opening ChatGPT with prompt pre-filled...', 'success');
+                    break;
+                case 'claude':
+                    // Try ?q= param (may or may not pre-fill), clipboard as fallback
+                    window.open(`https://claude.ai/new?q=${encodedPrompt}`, '_blank');
+                    App.showToast('Opening Claude... Prompt also copied to clipboard if needed.', 'success');
+                    break;
+                case 'gemini':
+                    // Gemini guided-learning mode natively supports ?query= for pre-filling
+                    window.open(`https://gemini.google.com/guided-learning?query=${encodedPrompt}`, '_blank');
+                    App.showToast('Opening Gemini with prompt pre-filled...', 'success');
+                    break;
+            }
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('outputTextarea');
+            textarea.select();
+            document.execCommand('copy');
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.background = '#2e7d32';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        // Manual entry functions
+        function showManualEntry() {
+            document.getElementById('manualEntryForm').style.display = 'block';
+            document.getElementById('textParserForm').style.display = 'none';
+        }
+
+        function hideManualEntry() {
+            document.getElementById('manualEntryForm').style.display = 'none';
+            // Clear form
+            document.getElementById('manualType').value = 'Lecture';
+            document.getElementById('manualTitle').value = '';
+            document.getElementById('manualSpeaker').value = '';
+            document.getElementById('manualDate').value = '';
+            document.getElementById('manualLocation').value = '';
+            document.getElementById('manualDescription').value = '';
+        }
+
+        function showTextParser() {
+            document.getElementById('textParserForm').style.display = 'block';
+            document.getElementById('manualEntryForm').style.display = 'none';
+        }
+
+        function hideTextParser() {
+            document.getElementById('textParserForm').style.display = 'none';
+            document.getElementById('parserText').value = '';
+        }
+
+        function parseText() {
+            const text = document.getElementById('parserText').value.trim();
+            if (!text) {
+                alert('Please paste some text');
+                return;
+            }
+
+            const item = {
+                'Type of Submission': 'Lecture',
+                'Title of Event/Talk/News': '',
+                'Who will be the speaker?': '',
+                'When will the talk/lecture take place?': '',
+                'Where will the talk/lecture take place?': '',
+                'Brief Description (What is it about?)': text
+            };
+
+            // Extract title (look for "Lecture "title"" or "Vorlesung "title"")
+            const titleMatch = text.match(/(?:Lecture|Vorlesung)\s+["']([^"']+)["']/i);
+            if (titleMatch) {
+                item['Title of Event/Talk/News'] = titleMatch[1];
+            }
+
+            // Extract speaker (look for "Dr." or names before "will give" or "wird")
+            const speakerMatch = text.match(/([^\.]+(?:Dr\.|Prof\.|Mr\.|Ms\.|Mrs\.)[^\.]+?)(?:will give|wird|from|vom|von der)/i) ||
+                                text.match(/([A-Z][^\.]+?)(?:\s+from|\s+vom|\s+von der|\s+will give|\s+wird)/);
+            if (speakerMatch) {
+                item['Who will be the speaker?'] = speakerMatch[1].trim();
+            }
+
+            // Extract date/time (look for dates like "November 27, 2025" or "27. November 2025")
+            const dateMatch = text.match(/((?:November|Dezember|Januar|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})/i) ||
+                            text.match(/(\d{1,2}\.\s*(?:November|Dezember|Januar|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4})/i);
+            if (dateMatch) {
+                let dateStr = dateMatch[1];
+                // Extract time if present
+                const timeMatch = text.match(/(?:from|von)\s+(\d{1,2}:\d{2})(?:\s+to|\s+bis)?\s*(\d{1,2}:\d{2})?/i);
+                if (timeMatch) {
+                    dateStr += timeMatch[2] ? `, from ${timeMatch[1]} to ${timeMatch[2]}` : `, from ${timeMatch[1]}`;
+                }
+                item['When will the talk/lecture take place?'] = dateStr;
+            }
+
+            // Extract location (look for "room" or "Raum" or "in room" or "im Raum")
+            const locationMatch = text.match(/(?:in|im)\s+(?:room|Raum)?\s*([A-Z]\s*\d+[^\.]+?)(?:\.|,|$)/i) ||
+                                text.match(/(?:room|Raum)\s+([A-Z]\s*\d+[^\.]+?)(?:\.|,|$)/i);
+            if (locationMatch) {
+                item['Where will the talk/lecture take place?'] = locationMatch[1].trim();
+            }
+
+            // If no title found, try to extract from the beginning
+            if (!item['Title of Event/Talk/News']) {
+                const firstLine = text.split('\n')[0];
+                const titleInLine = firstLine.match(/(?:Lecture|Vorlesung)\s+["']([^"']+)["']/i);
+                if (titleInLine) {
+                    item['Title of Event/Talk/News'] = titleInLine[1];
+                } else {
+                    item['Title of Event/Talk/News'] = firstLine.substring(0, 50);
+                }
+            }
+
+            if (!item['Title of Event/Talk/News']) {
+                alert('Could not extract title. Please use manual entry.');
+                return;
+            }
+
+            csvData.push(item);
+            displayItems(csvData);
+            hideTextParser();
+            
+            // Select the newly added item
+            selectItem(csvData.length - 1);
+            
+            App.showToast('Text parsed and added successfully!', 'success');
+        }
+
+        function addManualEntry() {
+            const item = {
+                'Type of Submission': document.getElementById('manualType').value,
+                'Title of Event/Talk/News': document.getElementById('manualTitle').value,
+                'Who will be the speaker?': document.getElementById('manualSpeaker').value,
+                'When will the talk/lecture take place?': document.getElementById('manualDate').value,
+                'Where will the talk/lecture take place?': document.getElementById('manualLocation').value,
+                'Brief Description (What is it about?)': document.getElementById('manualDescription').value
+            };
+
+            if (!item['Title of Event/Talk/News']) {
+                alert('Please enter a title');
+                return;
+            }
+
+            csvData.push(item);
+            displayItems(csvData);
+            hideManualEntry();
+            
+            // Select the newly added item
+            selectItem(csvData.length - 1);
+            
+            App.showToast('Item added successfully!', 'success');
+        }
+
+        // ===== Field Inspector Functions =====
+
+        function escapeHtmlAttr(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function populateInspector(item) {
+            const fields = CSVUtils._extractFields(item);
+            const type = fields.category;
+
+            // Reset cache with original values
+            inspectorFieldCache = { ...fields };
+
+            // Set type dropdown
+            document.getElementById('inspectorType').value = type;
+            document.getElementById('inspectorItemTitle').textContent = fields.title || 'Untitled';
+
+            // Render fields
+            renderInspectorFields(type, fields);
+
+            // Show inspector
+            document.getElementById('fieldInspector').style.display = 'block';
+            document.getElementById('fieldInspector').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderInspectorFields(type, fields) {
+            const typeConfig = CSVUtils.TYPE_FIELDS[type] || CSVUtils.TYPE_FIELDS.news;
+            const allFields = [...typeConfig.required, ...typeConfig.optional];
+            const container = document.getElementById('inspectorDynamicFields');
+
+            container.innerHTML = allFields.map(fieldKey => {
+                const label = CSVUtils.FIELD_LABELS[fieldKey] || { de: fieldKey, en: fieldKey };
+                const isRequired = typeConfig.required.includes(fieldKey);
+                const value = fields[fieldKey] || '';
+                const isEmpty = !value.trim();
+                const missingClass = isRequired && isEmpty ? ' missing-required' : '';
+                const tagHtml = isRequired
+                    ? '<span class="field-tag required">Required</span>'
+                    : '<span class="field-tag optional">Optional</span>';
+                const isTextarea = fieldKey === 'description' || fieldKey === 'biography';
+                const inputHtml = isTextarea
+                    ? `<textarea id="inspector_${fieldKey}" rows="3" style="resize: vertical;">${escapeHtmlAttr(value)}</textarea>`
+                    : `<input type="text" id="inspector_${fieldKey}" value="${escapeHtmlAttr(value)}" />`;
+
+                return `<div class="inspector-field${missingClass}" data-field="${fieldKey}">
+                    <label>${label.en} ${tagHtml}</label>
+                    ${inputHtml}
+                </div>`;
+            }).join('');
+
+            // Live highlight: clear missing-required when user types
+            allFields.forEach(fieldKey => {
+                const el = document.getElementById(`inspector_${fieldKey}`);
+                if (el && typeConfig.required.includes(fieldKey)) {
+                    el.addEventListener('input', () => {
+                        el.closest('.inspector-field').classList.toggle('missing-required', !el.value.trim());
+                    });
+                }
+            });
+        }
+
+        function onInspectorTypeChange() {
+            const type = document.getElementById('inspectorType').value;
+            // Save current form values to cache
+            const formValues = getInspectorFieldValues();
+            Object.assign(inspectorFieldCache, formValues);
+
+            // Get original fields as baseline
+            const originalFields = selectedItemIndex >= 0 ? CSVUtils._extractFields(csvData[selectedItemIndex]) : {};
+            // Merge: original → cache (cache includes user edits)
+            const merged = { ...originalFields, ...inspectorFieldCache };
+            renderInspectorFields(type, merged);
+        }
+
+        function getInspectorFieldValues() {
+            const values = {};
+            Object.keys(CSVUtils.FIELD_LABELS).forEach(key => {
+                const el = document.getElementById(`inspector_${key}`);
+                if (el) values[key] = el.value || '';
+            });
+            return values;
+        }
+
+        function buildItemFromInspector() {
+            const type = document.getElementById('inspectorType').value;
+            const typeLabel = CSVUtils.TYPE_LABELS[type] || CSVUtils.TYPE_LABELS.news;
+            const values = getInspectorFieldValues();
+
+            // Build a raw CSV-like object using the first key from each FIELD_MAPS entry
+            const item = {};
+            item[CSVUtils.FIELD_MAPS.type[0]] = typeLabel.en;
+
+            Object.keys(values).forEach(fieldKey => {
+                if (CSVUtils.FIELD_MAPS[fieldKey] && CSVUtils.FIELD_MAPS[fieldKey].length > 0) {
+                    item[CSVUtils.FIELD_MAPS[fieldKey][0]] = values[fieldKey];
+                }
+            });
+
+            return item;
+        }
+
+        function generateFromInspector() {
+            selectedItem = buildItemFromInspector();
+            document.getElementById('resultsSection').style.display = 'grid';
+            updateOutput();
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ===== Save to Newsletter Logic =====
+
+        function updateSavedCount() {
+            const data = StorageManager.getCSVItems();
+            const count = data.items ? data.items.length : 0;
+            const el = document.getElementById('csvSavedCount');
+            if (el) el.textContent = `${count} item${count !== 1 ? 's' : ''} saved`;
+        }
+
+        function saveAllCSVItems() {
+            if (csvData.length === 0) {
+                App.showToast('No items to save', 'error');
+                return;
+            }
+            StorageManager.clearCSVItems();
+            const transformed = CSVUtils.transformItems(csvData, currentLanguage);
+            // Auto-generate texts for all items
+            transformed.forEach((item, i) => {
+                item.generatedText = {
+                    de: CSVUtils.generateAllTexts(csvData[i], 'de'),
+                    en: CSVUtils.generateAllTexts(csvData[i], 'en')
+                };
+            });
+            const saved = StorageManager.addCSVItems(transformed);
+            updateSavedCount();
+            App.showToast(`${saved.length} CSV items saved with generated text!`, 'success');
+        }
+
+        function saveSelectedCSVItem() {
+            if (!selectedItem) {
+                App.showToast('No item selected', 'error');
+                return;
+            }
+            const transformed = CSVUtils.transformItem(selectedItem, currentLanguage);
+            // Auto-generate texts for this item
+            transformed.generatedText = {
+                de: CSVUtils.generateAllTexts(selectedItem, 'de'),
+                en: CSVUtils.generateAllTexts(selectedItem, 'en')
+            };
+            StorageManager.addCSVItem(transformed);
+            updateSavedCount();
+            App.showToast('CSV item saved with generated text!', 'success');
+        }
+
+        function clearSavedCSVItems() {
+            StorageManager.clearCSVItems();
+            updateSavedCount();
+            App.showToast('Saved CSV items cleared', 'success');
+        }
+
+        // Wire up save buttons
+        document.getElementById('btnSaveAllCSV').addEventListener('click', saveAllCSVItems);
+        document.getElementById('btnSaveSelectedCSV').addEventListener('click', saveSelectedCSVItem);
+        document.getElementById('btnClearSavedCSV').addEventListener('click', clearSavedCSVItems);
+
+        // Initialize saved count on load
+        updateSavedCount();
+
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('mobile-open');
+        });
+    </script>
+</body>
+</html>

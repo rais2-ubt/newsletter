@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - Subscribers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        .subscriber-row {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--ubt-light-gray);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: revealUp var(--duration-normal) var(--ease-out-expo) forwards;
+        }
+        .subscriber-row:hover {
+            background: var(--ubt-green-light);
+        }
+        /* Stagger subscriber rows */
+        .subscriber-row:nth-child(1) { animation-delay: 0ms; }
+        .subscriber-row:nth-child(2) { animation-delay: 30ms; }
+        .subscriber-row:nth-child(3) { animation-delay: 60ms; }
+        .subscriber-row:nth-child(4) { animation-delay: 90ms; }
+        .subscriber-row:nth-child(5) { animation-delay: 120ms; }
+        .subscriber-row:nth-child(6) { animation-delay: 150ms; }
+        .subscriber-row:nth-child(7) { animation-delay: 180ms; }
+        .subscriber-row:nth-child(8) { animation-delay: 210ms; }
+        .subscriber-row:nth-child(9) { animation-delay: 240ms; }
+        .subscriber-row:nth-child(10) { animation-delay: 270ms; }
+        .subscriber-info {
+            flex: 1;
+        }
+        .subscriber-email {
+            font-weight: 600;
+            color: var(--ubt-dark-gray);
+        }
+        .subscriber-name {
+            font-size: 13px;
+            color: var(--ubt-medium-gray);
+        }
+        .subscriber-date {
+            font-size: 12px;
+            color: var(--ubt-medium-gray);
+        }
+        .subscriber-status {
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .subscriber-status.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .subscriber-status.inactive {
+            background: var(--ubt-light-gray);
+            color: var(--ubt-medium-gray);
+        }
+        .subscriber-status.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .subscriber-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        .search-bar {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        .search-bar .form-input {
+            flex: 1;
+        }
+        /* Sync UI Styles */
+        .sync-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid var(--ubt-light-gray);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            opacity: 0;
+            transform: translateY(15px);
+            animation: revealUp var(--duration-slow) var(--ease-out-expo) forwards;
+            animation-delay: 100ms;
+        }
+        .sync-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        .sync-title {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 600;
+            color: var(--ubt-dark-gray);
+        }
+        .sync-title svg {
+            color: var(--ubt-green);
+        }
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--ubt-medium-gray);
+        }
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ubt-medium-gray);
+        }
+        .sync-dot.syncing {
+            background: #ff9800;
+            animation: pulse 1s infinite;
+        }
+        .sync-dot.success {
+            background: #4caf50;
+        }
+        .sync-dot.error {
+            background: #f44336;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .sync-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: background-color var(--duration-normal) var(--ease-out-expo);
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: transform var(--duration-normal) var(--ease-spring);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--ubt-green);
+        }
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        .sync-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        .sync-info {
+            font-size: 12px;
+            color: var(--ubt-medium-gray);
+            margin-top: var(--spacing-sm);
+        }
+        .sync-info a {
+            color: var(--ubt-green);
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header flex flex-between flex-center">
+                <div>
+                    <h1 class="page-title">Subscribers</h1>
+                    <p class="page-subtitle">Manage your newsletter recipients</p>
+                </div>
+                <div class="flex gap-md">
+                    <button class="btn btn-secondary" id="btnExportCSV">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        Export CSV
+                    </button>
+                    <label class="btn btn-secondary" style="cursor:pointer;">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                        Import CSV
+                        <input type="file" id="importCSV" accept=".csv" style="display:none;">
+                    </label>
+                    <button class="btn btn-primary" id="btnAddSubscriber">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        Add Subscriber
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cloud Sync Section -->
+            <div class="sync-card" id="syncSection">
+                <div class="sync-header">
+                    <div class="sync-title">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                        Google Sheets Sync
+                    </div>
+                    <div class="sync-status">
+                        <div class="sync-indicator" id="syncIndicator">
+                            <span class="sync-dot" id="syncDot"></span>
+                            <span id="syncStatusText">Not enabled</span>
+                        </div>
+                        <div class="sync-actions">
+                            <button class="btn btn-sm btn-secondary" id="btnSyncNow" disabled>
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                                Sync Now
+                            </button>
+                            <button class="btn btn-sm btn-secondary" id="btnPullFromSheets" disabled>
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                Pull from Sheets
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex flex-between flex-center">
+                    <div class="sync-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="syncEnabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size:14px;">Enable cloud sync</span>
+                    </div>
+                    <div class="sync-info" id="syncInfo">
+                        Configure Apps Script in <a href="settings.html">Settings</a> to enable sync.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid stagger-children" style="grid-template-columns: repeat(3, 1fr); margin-bottom: var(--spacing-xl);">
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-value text-green" id="statTotal">0</div>
+                        <div class="stat-label">Total Subscribers</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-value" id="statActive" style="color:#2e7d32;">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-value" id="statInactive" style="color:#7F8990;">0</div>
+                        <div class="stat-label">Inactive</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscriber List -->
+            <div class="card mail-card reveal">
+                <div class="card-body">
+                    <div class="search-bar">
+                        <input type="text" class="form-input" id="searchInput" placeholder="Search by email or name...">
+                        <select class="form-select" id="filterStatus" style="width:auto;">
+                            <option value="all">All</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div id="subscriberList">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="subscriberModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add Subscriber</h3>
+                <button class="modal-close" onclick="App.closeModal('subscriberModal')">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="subscriberForm">
+                    <input type="hidden" id="subscriberId">
+                    <div class="form-group">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-input" id="subscriberEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Name (optional)</label>
+                        <input type="text" class="form-input" id="subscriberName">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal('subscriberModal')">Cancel</button>
+                <button class="btn btn-primary" id="btnSaveSubscriber">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/newsletter.js"></script>
+    <script src="js/email.js"></script>
+    <script src="js/subscribers.js"></script>
+    <script src="js/motion.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSubscribers();
+            updateStats();
+            initSyncUI();
+
+            // Trigger stagger animations
+            if (window.Motion) {
+                Motion.revealStaggered(document.querySelectorAll('.stats-grid > .stat-card'));
+                Motion.reveal(document.querySelector('.card.mail-card'));
+            }
+
+            // Search
+            document.getElementById('searchInput').addEventListener('input', App.debounce((e) => {
+                searchQuery = e.target.value.toLowerCase();
+                loadSubscribers();
+            }, 300));
+
+            // Filter
+            document.getElementById('filterStatus').addEventListener('change', (e) => {
+                currentFilter = e.target.value;
+                loadSubscribers();
+            });
+
+            // Add subscriber button
+            document.getElementById('btnAddSubscriber').addEventListener('click', () => {
+                document.getElementById('modalTitle').textContent = 'Add Subscriber';
+                document.getElementById('subscriberId').value = '';
+                document.getElementById('subscriberEmail').value = '';
+                document.getElementById('subscriberName').value = '';
+                App.openModal('subscriberModal');
+            });
+
+            // Save subscriber
+            document.getElementById('btnSaveSubscriber').addEventListener('click', async () => {
+                const id = document.getElementById('subscriberId').value;
+                const email = document.getElementById('subscriberEmail').value.trim();
+                const name = document.getElementById('subscriberName').value.trim() || null;
+
+                if (!email) {
+                    App.showToast('Email is required', 'error');
+                    return;
+                }
+
+                if (!EmailService.isValidEmail(email)) {
+                    App.showToast('Invalid email format', 'error');
+                    return;
+                }
+
+                if (id) {
+                    // Edit - use sync if enabled
+                    if (SubscriberManager.isSheetsEnabled()) {
+                        SubscriberManager.updateWithSync(id, { email, name });
+                    } else {
+                        SubscriberManager.update(id, { email, name });
+                    }
+                    App.showToast('Subscriber updated', 'success');
+                } else {
+                    // Add - use sync if enabled
+                    let result;
+                    if (SubscriberManager.isSheetsEnabled()) {
+                        result = await SubscriberManager.addWithSync(email, name, 'admin');
+                    } else {
+                        result = SubscriberManager.add(email, name);
+                    }
+                    if (!result.success) {
+                        App.showToast(result.error, 'error');
+                        return;
+                    }
+                    App.showToast('Subscriber added', 'success');
+                }
+
+                App.closeModal('subscriberModal');
+                loadSubscribers();
+                updateStats();
+                App.updateNavBadges();
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCSV').addEventListener('click', () => {
+                SubscriberManager.downloadCSV();
+                App.showToast('CSV exported!', 'success');
+            });
+
+            // Import CSV
+            document.getElementById('importCSV').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                try {
+                    const text = await App.readFileAsText(file);
+                    const result = SubscriberManager.importCSV(text);
+                    App.showToast(`Added ${result.added} subscribers, ${result.skipped} skipped`, 'success');
+                    loadSubscribers();
+                    updateStats();
+                    App.updateNavBadges();
+                } catch (e) {
+                    App.showToast('Failed to import CSV', 'error');
+                }
+
+                e.target.value = '';
+            });
+        });
+
+        function loadSubscribers() {
+            const container = document.getElementById('subscriberList');
+            let subscribers = SubscriberManager.getAll();
+
+            // Apply filter
+            if (currentFilter === 'active') {
+                subscribers = subscribers.filter(s => s.active);
+            } else if (currentFilter === 'inactive') {
+                subscribers = subscribers.filter(s => !s.active);
+            }
+
+            // Apply search
+            if (searchQuery) {
+                subscribers = subscribers.filter(s =>
+                    s.email.toLowerCase().includes(searchQuery) ||
+                    (s.name && s.name.toLowerCase().includes(searchQuery))
+                );
+            }
+
+            if (subscribers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="opacity:0.3;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3z"/></svg>
+                        <h3>No subscribers${searchQuery ? ' found' : ' yet'}</h3>
+                        <p>${searchQuery ? 'Try a different search' : 'Add your first subscriber to get started'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = subscribers.map(sub => {
+                const statusClass = sub.status === 'pending' ? 'pending' : (sub.active ? 'active' : 'inactive');
+                const statusText = sub.status === 'pending' ? 'Pending' : (sub.active ? 'Active' : 'Inactive');
+                return `
+                <div class="subscriber-row" data-id="${sub.id}">
+                    <div class="subscriber-info">
+                        <div class="subscriber-email">${App.escapeHtml(sub.email)}</div>
+                        ${sub.name ? `<div class="subscriber-name">${App.escapeHtml(sub.name)}</div>` : ''}
+                        <div class="subscriber-date">Added ${App.formatRelativeTime(sub.addedAt)}</div>
+                    </div>
+                    <span class="subscriber-status ${statusClass}">${statusText}</span>
+                    <div class="subscriber-actions">
+                        <button class="btn btn-sm btn-icon btn-secondary" onclick="toggleStatus('${sub.id}')" title="${sub.active ? 'Deactivate' : 'Activate'}">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="${sub.active ? 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' : 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z'}"/></svg>
+                        </button>
+                        <button class="btn btn-sm btn-icon btn-secondary" onclick="editSubscriber('${sub.id}')" title="Edit">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button class="btn btn-sm btn-icon btn-secondary" onclick="deleteSubscriber('${sub.id}')" title="Delete">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function updateStats() {
+            const counts = SubscriberManager.getCounts();
+            document.getElementById('statTotal').textContent = counts.total;
+            document.getElementById('statActive').textContent = counts.active;
+            document.getElementById('statInactive').textContent = counts.inactive;
+        }
+
+        function editSubscriber(id) {
+            const sub = SubscriberManager.getAll().find(s => s.id === id);
+            if (!sub) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Subscriber';
+            document.getElementById('subscriberId').value = sub.id;
+            document.getElementById('subscriberEmail').value = sub.email;
+            document.getElementById('subscriberName').value = sub.name || '';
+            App.openModal('subscriberModal');
+        }
+
+        async function toggleStatus(id) {
+            if (SubscriberManager.isSheetsEnabled()) {
+                const sub = SubscriberManager.getAll().find(s => s.id === id);
+                if (sub) {
+                    await SubscriberManager.updateWithSync(id, { active: !sub.active });
+                }
+            } else {
+                SubscriberManager.toggleActive(id);
+            }
+            loadSubscribers();
+            updateStats();
+            App.updateNavBadges();
+        }
+
+        async function deleteSubscriber(id) {
+            if (!App.confirm('Are you sure you want to delete this subscriber?')) return;
+
+            if (SubscriberManager.isSheetsEnabled()) {
+                await SubscriberManager.removeWithSync(id);
+            } else {
+                SubscriberManager.remove(id);
+            }
+            loadSubscribers();
+            updateStats();
+            App.updateNavBadges();
+            App.showToast('Subscriber deleted', 'success');
+        }
+
+        // ===== Sync UI Functions =====
+
+        function initSyncUI() {
+            const emailConfigured = EmailService.isConfigured();
+            const sheetsConfig = StorageManager.getSheetsConfig();
+            const syncEnabled = sheetsConfig.enabled && emailConfigured;
+
+            // Set toggle state
+            const toggle = document.getElementById('syncEnabled');
+            toggle.checked = sheetsConfig.enabled;
+            toggle.disabled = !emailConfigured;
+
+            // Update buttons
+            updateSyncButtons(syncEnabled);
+
+            // Update status display
+            updateSyncStatusUI();
+
+            // Toggle event
+            toggle.addEventListener('change', (e) => {
+                const enabled = e.target.checked;
+                StorageManager.setSheetsConfig({ enabled });
+                updateSyncButtons(enabled && emailConfigured);
+                updateSyncStatusUI();
+
+                if (enabled && emailConfigured) {
+                    App.showToast('Sheets sync enabled', 'success');
+                }
+            });
+
+            // Sync Now button
+            document.getElementById('btnSyncNow').addEventListener('click', async () => {
+                await syncToSheets();
+            });
+
+            // Pull from Sheets button
+            document.getElementById('btnPullFromSheets').addEventListener('click', async () => {
+                await pullFromSheets();
+            });
+
+            // Listen for storage changes
+            window.addEventListener('storageChange', (e) => {
+                if (e.detail.key === StorageManager.KEYS.SYNC_STATUS) {
+                    updateSyncStatusUI();
+                }
+            });
+        }
+
+        function updateSyncButtons(enabled) {
+            document.getElementById('btnSyncNow').disabled = !enabled;
+            document.getElementById('btnPullFromSheets').disabled = !enabled;
+        }
+
+        function updateSyncStatusUI() {
+            const emailConfigured = EmailService.isConfigured();
+            const sheetsConfig = StorageManager.getSheetsConfig();
+            const syncStatus = StorageManager.getSyncStatus();
+
+            const dot = document.getElementById('syncDot');
+            const statusText = document.getElementById('syncStatusText');
+            const syncInfo = document.getElementById('syncInfo');
+
+            // Remove all status classes
+            dot.classList.remove('syncing', 'success', 'error');
+
+            if (!emailConfigured) {
+                statusText.textContent = 'Apps Script not configured';
+                syncInfo.innerHTML = 'Configure Apps Script in <a href="settings.html">Settings</a> to enable sync.';
+                return;
+            }
+
+            if (!sheetsConfig.enabled) {
+                statusText.textContent = 'Not enabled';
+                syncInfo.textContent = 'Enable sync to keep subscribers in sync with Google Sheets.';
+                return;
+            }
+
+            // Show status based on sync state
+            switch (syncStatus.status) {
+                case 'syncing':
+                    dot.classList.add('syncing');
+                    statusText.textContent = 'Syncing...';
+                    break;
+                case 'success':
+                    dot.classList.add('success');
+                    if (syncStatus.lastSync) {
+                        statusText.textContent = `Synced ${App.formatRelativeTime(syncStatus.lastSync)}`;
+                    } else {
+                        statusText.textContent = 'Synced';
+                    }
+                    break;
+                case 'error':
+                    dot.classList.add('error');
+                    statusText.textContent = 'Sync failed';
+                    break;
+                default:
+                    statusText.textContent = 'Ready to sync';
+            }
+
+            // Update info text
+            if (syncStatus.pendingChanges) {
+                syncInfo.textContent = 'Changes pending sync.';
+            } else if (syncStatus.error) {
+                syncInfo.textContent = `Error: ${syncStatus.error}`;
+            } else {
+                syncInfo.textContent = 'Subscribers will sync with your Google Sheet.';
+            }
+        }
+
+        async function syncToSheets() {
+            const btn = document.getElementById('btnSyncNow');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Syncing...';
+
+            try {
+                const result = await SubscriberManager.syncToSheets();
+
+                if (result.success) {
+                    App.showToast('Synced to Google Sheets', 'success');
+                } else {
+                    App.showToast(result.error || 'Sync failed', 'error');
+                }
+            } catch (e) {
+                App.showToast('Sync failed: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                    Sync Now
+                `;
+                updateSyncStatusUI();
+            }
+        }
+
+        async function pullFromSheets() {
+            const btn = document.getElementById('btnPullFromSheets');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;"></span> Pulling...';
+
+            try {
+                const result = await SubscriberManager.fetchFromSheets();
+
+                if (result.success) {
+                    loadSubscribers();
+                    updateStats();
+                    App.updateNavBadges();
+                    App.showToast('Pulled subscribers from Google Sheets', 'success');
+                } else {
+                    App.showToast(result.error || 'Pull failed', 'error');
+                }
+            } catch (e) {
+                App.showToast('Pull failed: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Pull from Sheets
+                `;
+                updateSyncStatusUI();
+            }
+        }
+    </script>
+</body>
+</html>

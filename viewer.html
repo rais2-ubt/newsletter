@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIS² Newsletter - Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <style>
+        .newsletter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        .newsletter-card {
+            background: var(--paper-cream);
+            border-radius: 2px;
+            box-shadow: var(--shadow-paper);
+            overflow: hidden;
+            transition: transform var(--duration-normal) var(--ease-out-expo),
+                        box-shadow var(--duration-normal) var(--ease-out-expo);
+        }
+        .newsletter-card:hover {
+            transform: translateY(-6px) rotate(-0.2deg);
+            box-shadow: var(--shadow-paper-hover);
+        }
+        .newsletter-preview {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            background: var(--ubt-light-gray);
+        }
+        .newsletter-preview iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            pointer-events: none;
+            border: none;
+        }
+        .newsletter-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to top, var(--ubt-white), transparent);
+        }
+        .newsletter-info {
+            padding: var(--spacing-lg);
+        }
+        .newsletter-title {
+            font-family: var(--font-headline);
+            font-size: 18px;
+            color: var(--ubt-dark-gray);
+            margin-bottom: var(--spacing-sm);
+        }
+        .newsletter-meta {
+            font-size: 13px;
+            color: var(--ubt-medium-gray);
+            margin-bottom: var(--spacing-md);
+        }
+        .newsletter-status {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: var(--radius-sm);
+        }
+        .newsletter-status.sent {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .newsletter-status.draft {
+            background: var(--ubt-light-gray);
+            color: var(--ubt-medium-gray);
+        }
+        .newsletter-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--ubt-light-gray);
+        }
+        .preview-modal-frame {
+            width: 100%;
+            height: 70vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Newsletter Archive</h1>
+                <p class="page-subtitle">View and manage your saved newsletters</p>
+            </div>
+
+            <div id="newsletterList">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="previewTitle">Newsletter Preview</h3>
+                <button class="modal-close" onclick="App.closeModal('previewModal')">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding:0;">
+                <iframe id="previewFrame" class="preview-modal-frame"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnDownloadPreview">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download
+                </button>
+                <button class="btn btn-secondary" id="btnCopyPreview">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1z"/></svg>
+                    Copy HTML
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/scraper.js"></script>
+    <script src="js/tracker.js"></script>
+    <script src="js/newsletter.js"></script>
+    <script src="js/email.js"></script>
+    <script src="js/subscribers.js"></script>
+    <script src="js/motion.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        let currentNewsletter = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNewsletters();
+        });
+
+        function loadNewsletters() {
+            const container = document.getElementById('newsletterList');
+            const data = StorageManager.getNewsletters();
+            const newsletters = data.newsletters || [];
+
+            if (newsletters.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="opacity:0.3;"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27z"/></svg>
+                        <h3>No newsletters yet</h3>
+                        <p>Create your first newsletter to see it here.</p>
+                        <a href="builder.html" class="btn btn-primary mt-lg">Create Newsletter</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `<div class="newsletter-grid stagger-children" id="newsletterGrid">${newsletters.map(nl => `
+                <div class="newsletter-card" data-id="${nl.id}">
+                    <div class="newsletter-preview">
+                        <iframe srcdoc="${App.escapeHtml(nl.html)}"></iframe>
+                    </div>
+                    <div class="newsletter-info">
+                        <h3 class="newsletter-title">${App.escapeHtml(nl.title)}</h3>
+                        <div class="newsletter-meta">
+                            <span class="newsletter-status ${nl.sentAt ? 'sent' : 'draft'}">${nl.sentAt ? 'Sent' : 'Draft'}</span>
+                            ${nl.sentAt ? `<span> to ${nl.recipientCount} recipients</span>` : ''}
+                            <div style="margin-top:4px;">${App.formatDate(nl.createdAt)}</div>
+                        </div>
+                        <div class="newsletter-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="viewNewsletter('${nl.id}')">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>
+                                View
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="downloadNewsletter('${nl.id}')">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="deleteNewsletter('${nl.id}')" style="margin-left:auto;">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+
+            // Trigger stagger animations for newsletter cards
+            if (window.Motion) {
+                Motion.revealStaggered(document.querySelectorAll('.newsletter-card'));
+            }
+        }
+
+        function viewNewsletter(id) {
+            const nl = StorageManager.getNewsletter(id);
+            if (!nl) return;
+
+            currentNewsletter = nl;
+            document.getElementById('previewTitle').textContent = nl.title;
+            document.getElementById('previewFrame').srcdoc = nl.html;
+            App.openModal('previewModal');
+        }
+
+        function downloadNewsletter(id) {
+            const nl = StorageManager.getNewsletter(id);
+            if (!nl) return;
+
+            NewsletterGenerator.download(nl.html, `${nl.title.replace(/[^a-z0-9]/gi, '_')}.html`);
+            App.showToast('Newsletter downloaded!', 'success');
+        }
+
+        function deleteNewsletter(id) {
+            if (!App.confirm('Are you sure you want to delete this newsletter?')) return;
+
+            StorageManager.deleteNewsletter(id);
+            loadNewsletters();
+            App.updateNavBadges();
+            App.showToast('Newsletter deleted', 'success');
+        }
+
+        // Preview modal buttons
+        document.getElementById('btnDownloadPreview').addEventListener('click', () => {
+            if (currentNewsletter) {
+                NewsletterGenerator.download(currentNewsletter.html, `${currentNewsletter.title.replace(/[^a-z0-9]/gi, '_')}.html`);
+            }
+        });
+
+        document.getElementById('btnCopyPreview').addEventListener('click', async () => {
+            if (currentNewsletter) {
+                await NewsletterGenerator.copyToClipboard(currentNewsletter.html);
+                App.showToast('HTML copied to clipboard!', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
