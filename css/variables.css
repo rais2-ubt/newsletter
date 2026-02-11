@@ -1,0 +1,152 @@
+/* ================================
+   University of Bayreuth
+   Corporate Design Variables
+   ================================ */
+
+:root {
+    /* Official UBT Corporate Design Colors */
+    --ubt-green: #009260;
+    --ubt-green-dark: #007a4f;
+    --ubt-green-light: #e6f4ef;
+    --ubt-dark-gray: #48535A;
+    --ubt-medium-gray: #7F8990;
+    --ubt-light-gray: #EBEBE4;
+    --ubt-white: #FFFFFF;
+    --ubt-black: #000000;
+
+    /* Category Colors */
+    --color-news: #2e7d32;
+    --color-news-bg: #e8f5e9;
+    --color-event: #1565c0;
+    --color-event-bg: #e3f2fd;
+    --color-lecture: #ef6c00;
+    --color-lecture-bg: #fff3e0;
+    --color-publication: #7b1fa2;
+    --color-publication-bg: #f3e5f5;
+    --color-member: #00838f;
+    --color-member-bg: #e0f7fa;
+    --color-project: #c2185b;
+    --color-project-bg: #fce4ec;
+
+    /* Typography */
+    --font-headline: 'Crimson Text', Georgia, serif;
+    --font-body: 'Source Sans Pro', 'Segoe UI', system-ui, sans-serif;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(72, 83, 90, 0.08);
+    --shadow-md: 0 4px 12px rgba(72, 83, 90, 0.1);
+    --shadow-lg: 0 8px 24px rgba(72, 83, 90, 0.15);
+    --shadow-hover: 0 6px 20px rgba(0, 146, 96, 0.12);
+
+    /* Paper/Mail Card Shadows - Layered for realistic depth */
+    --shadow-paper:
+        0 1px 1px rgba(72, 83, 90, 0.04),
+        0 2px 4px rgba(72, 83, 90, 0.06),
+        0 4px 8px rgba(72, 83, 90, 0.06),
+        0 8px 16px rgba(72, 83, 90, 0.06);
+    --shadow-paper-hover:
+        0 2px 2px rgba(72, 83, 90, 0.04),
+        0 4px 8px rgba(72, 83, 90, 0.08),
+        0 8px 16px rgba(72, 83, 90, 0.08),
+        0 16px 32px rgba(72, 83, 90, 0.08);
+    --shadow-paper-lifted:
+        0 4px 8px rgba(72, 83, 90, 0.06),
+        0 8px 16px rgba(72, 83, 90, 0.08),
+        0 16px 32px rgba(72, 83, 90, 0.1),
+        0 24px 48px rgba(72, 83, 90, 0.08);
+
+    /* Paper Colors */
+    --paper-cream: #FDFCFA;
+    --paper-edge-light: rgba(255, 255, 255, 0.8);
+    --paper-edge-shadow: rgba(72, 83, 90, 0.1);
+
+    /* Motion Timing Functions */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Animation Durations */
+    --duration-instant: 100ms;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 400ms;
+    --duration-slower: 600ms;
+    --duration-page: 300ms;
+
+    /* Stagger Delays */
+    --stagger-delay: 50ms;
+    --stagger-delay-long: 80ms;
+
+    /* Transform Values */
+    --translate-sm: 8px;
+    --translate-md: 16px;
+    --translate-lg: 24px;
+    --scale-pressed: 0.97;
+    --scale-hover: 1.02;
+
+    /* Transitions */
+    --transition: all 0.25s ease;
+    --transition-fast: all 0.15s ease;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+
+    /* Layout */
+    --max-width: 1200px;
+    --sidebar-width: 280px;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ubt-light-gray: #1a1d1f;
+        --ubt-white: #0d0f10;
+        --ubt-dark-gray: #e8e8e8;
+        --ubt-medium-gray: #a8b0b8;
+
+        /* Paper colors for dark mode */
+        --paper-cream: #1E1E1C;
+        --paper-edge-light: rgba(255, 255, 255, 0.05);
+        --paper-edge-shadow: rgba(0, 0, 0, 0.3);
+
+        /* Adjusted shadows for dark backgrounds */
+        --shadow-paper:
+            0 1px 2px rgba(0, 0, 0, 0.2),
+            0 2px 4px rgba(0, 0, 0, 0.15),
+            0 4px 8px rgba(0, 0, 0, 0.1),
+            0 8px 16px rgba(0, 0, 0, 0.08);
+        --shadow-paper-hover:
+            0 2px 4px rgba(0, 0, 0, 0.25),
+            0 4px 8px rgba(0, 0, 0, 0.2),
+            0 8px 16px rgba(0, 0, 0, 0.15),
+            0 16px 32px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --duration-instant: 0ms;
+        --duration-fast: 0ms;
+        --duration-normal: 0ms;
+        --duration-slow: 0ms;
+        --duration-slower: 0ms;
+        --duration-page: 0ms;
+        --stagger-delay: 0ms;
+        --stagger-delay-long: 0ms;
+        --transition: none;
+        --transition-fast: none;
+    }
+}
